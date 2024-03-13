@@ -1,0 +1,40 @@
+/* CSS pour Accueil */
+
+span
+{
+    font-weight: bold;
+}
+
+#accueil_span
+{
+    color: brown;
+}
+
+#biographie_span
+{
+    color:  orange;
+}
+
+#travaux_span
+{
+    color:  yellow;
+}
+
+#articles_span
+{
+    color:  greenyellow;
+}
+
+#ouvrages_span
+{
+    color:  green;
+}
+
+#boole_img
+{
+    display: block;
+    margin-left: auto;
+    padding: 20px;
+    padding-right: unset;
+    width: 40%;
+}

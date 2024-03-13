@@ -15,3 +15,6 @@ Dispose d'une version en ligne de commande et d'une avec une interface graphique
 **Interface graphique**
 
 ![Interface en ligne de commande](https://github.com/MrBeam89/projets-nsi/blob/main/docs/nci-gui-screenshot.png?raw=true)
+
+## George Boole
+Présentation de George Boole
