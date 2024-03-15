@@ -39,12 +39,24 @@ def rem_rep(repertoire, nom):
 
 # Rechercher numéro d'après le nom
 def find_number(repertoire, nom):
-    print("Non-implémenté")
+    for entree in repertoire.items():           # Pour chaque entrée dans le répertoire
+        if entree[0].startswith(nom):           # Si le nom de l'entrée commence par les caractères donnés
+            print(f"{entree[0]} : {entree[1]}") # Afficher l'entrée (élément 0 : nom; élément 1 : numéro)
 
 # Rechercher nom d'après le numéro
 def find_name(repertoire, numero):
-    print("Non-implémenté")
+    if not numero.isdigit(): return None        # Si le numéro contient autre chose que des chiffres
+    for entree in repertoire.items():           # Pour chaque entrée dans le répertoire
+        if entree[1].startswith(numero):        # Si le numéro de l'entrée commence par les chiffres donnés
+            print(f"{entree[0]} : {entree[1]}") # Afficher l'entrée (élément 0 : nom; élément 1 : numéro)
 
+# Tests
 repertoire = init_rep(CSV_FILENAME)
 print(repertoire)
 list_rep(repertoire)
+
+nom = input("\nChercher (nom): ")
+find_number(repertoire, nom)
+
+numero = input("\nChercher (numero): ")
+find_name(repertoire, numero)
