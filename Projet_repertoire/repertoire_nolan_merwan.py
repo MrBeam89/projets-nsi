@@ -1,15 +1,15 @@
 import ES_csv
 
-CSV_FILENAME = "test2"
+filename = "test2"
 
 # Initialiser le répertoire
 def init_rep(filename):
     # Essaye d'ouvrir le répertoire en format CSV. S'il n'existe pas, créé un nouveau répertoire
     try:
-        donnees = ES_csv.read_rep(CSV_FILENAME)
+        donnees = ES_csv.read_rep(filename)
         return donnees
     except FileNotFoundError:
-        ES_csv.write_rep({}, CSV_FILENAME) # Créé un répertoire vide
+        ES_csv.write_rep({}, filename) # Créé un répertoire vide
         return {}
     except Exception as e: # En cas d'autres erreurs
         print(e)
@@ -17,8 +17,8 @@ def init_rep(filename):
 
 # Mettre à jour le répertoire
 def update_rep(repertoire):
-    ES_csv.write_rep(repertoire, CSV_FILENAME)
-    repertoire = ES_csv.read_rep(CSV_FILENAME)
+    ES_csv.write_rep(repertoire, filename)
+    repertoire = ES_csv.read_rep(filename)
 
 # Lister les entrées
 def list_rep(repertoire):
@@ -49,14 +49,3 @@ def find_name(repertoire, numero):
     for entree in repertoire.items():           # Pour chaque entrée dans le répertoire
         if entree[1].startswith(numero):        # Si le numéro de l'entrée commence par les chiffres donnés
             print(f"{entree[0]} : {entree[1]}") # Afficher l'entrée (élément 0 : nom; élément 1 : numéro)
-
-# Tests
-repertoire = init_rep(CSV_FILENAME)
-print(repertoire)
-list_rep(repertoire)
-
-nom = input("\nChercher (nom): ")
-find_number(repertoire, nom)
-
-numero = input("\nChercher (numero): ")
-find_name(repertoire, numero)
