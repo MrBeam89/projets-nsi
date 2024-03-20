@@ -1,24 +1,20 @@
 import ES_csv
 
-filename = "test2"
-
 # Initialiser le répertoire
 def init_rep(filename):
     # Essaye d'ouvrir le répertoire en format CSV. S'il n'existe pas, créé un nouveau répertoire
     try:
         donnees = ES_csv.read_rep(filename)
+        global csv_filename
+        csv_filename = filename
         return donnees
     except FileNotFoundError:
         ES_csv.write_rep({}, filename) # Créé un répertoire vide
+        csv_filename = filename
         return {}
     except Exception as e: # En cas d'autres erreurs
         print(e)
         exit()
-
-# Mettre à jour le répertoire
-def update_rep(repertoire):
-    ES_csv.write_rep(repertoire, filename)
-    repertoire = ES_csv.read_rep(filename)
 
 # Lister les entrées
 def list_rep(repertoire):
@@ -30,12 +26,12 @@ def list_rep(repertoire):
 def add_rep(repertoire, nom, numero):
     if not numero.strip().isdigit(): return None
     repertoire[nom] = numero
-    repertoire = update_rep(repertoire)
+    ES_csv.write_rep(repertoire, csv_filename)
 
 # Supprimer une entrée du répertoire
 def rem_rep(repertoire, nom):
     del repertoire[nom]
-    repertoire = update_rep(repertoire)
+    ES_csv.write_rep(repertoire, csv_filename)
 
 # Rechercher numéro d'après le nom
 def find_number(repertoire, nom):
