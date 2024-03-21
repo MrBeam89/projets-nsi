@@ -33,7 +33,8 @@ def open_file():
     for name in repertoire.keys():
         number = repertoire[name][0]
         email = repertoire[name][1]
-        entrees_table.insert(parent='',index='end', text='', values=(name, number, email, ''))
+        favorite = repertoire[name][2]
+        entrees_table.insert(parent='',index='end', text='', values=(name, number, email, favorite))
 
 # Réinitialise le tableau d'entrées
 def clear_table():

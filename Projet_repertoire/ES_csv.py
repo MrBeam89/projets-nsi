@@ -19,7 +19,7 @@ Retourne le reperoire contenu dans le fichier nomf.csv sous forme de dictionnair
         myrep=csv.reader(myfile, delimiter=';', dialect='excel', lineterminator='\n')
         # lecture du fichier
         for row in myrep:
-            rep[row[0]]=[row[1],row[2]]
+            rep[row[0]]=[row[1],row[2],row[3]]
         # Fermeture du fichier
         myfile.close()
 
@@ -38,7 +38,7 @@ Verse le contenu du repertoite rep (dictionnaire) dans le fichier nomf.csv
 
     # Ecriture du fichier
     for n,t in rep.items():
-        mywriter.writerow([n,t[0],t[1]])
+        mywriter.writerow([n,t[0],t[1],t[2]])
 
     # fermeture du fichier
     myfile.close()
