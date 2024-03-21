@@ -30,8 +30,10 @@ def open_file():
     filename = filedialog.askopenfilename()
     repertoire = rep.init_rep(filename)
     clear_table()
-    for key in repertoire.keys():
-        entrees_table.insert(parent='',index='end', text='', values=(key, repertoire[key], '', ''))
+    for name in repertoire.keys():
+        number = repertoire[name][0]
+        email = repertoire[name][1]
+        entrees_table.insert(parent='',index='end', text='', values=(name, number, email, ''))
 
 # Réinitialise le tableau d'entrées
 def clear_table():
