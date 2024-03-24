@@ -23,9 +23,11 @@ def list_rep(repertoire):
     return None
 
 # Ajouter une entrée au répertoire
-def add_rep(repertoire, nom, numero):
-    if not numero.strip().isdigit(): return None
-    repertoire[nom] = numero
+def add_rep(repertoire, nom, numero, email, favori):
+    repertoire[nom] = ['', '', '', '']
+    repertoire[nom][0] = numero
+    repertoire[nom][1] = email
+    repertoire[nom][2] = favori
     ES_csv.write_rep(repertoire, csv_filename)
 
 # Supprimer une entrée du répertoire

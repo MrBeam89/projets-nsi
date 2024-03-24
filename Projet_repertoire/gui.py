@@ -1,15 +1,38 @@
 from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
+from pygame import mixer # Pour le son
 import repertoire_nolan_merwan as rep
 
 global repertoire
+global repertoire_ouvert
+repertoire_ouvert = False
+
+# Easter egg
+mixer.init()
+sound_file_path = 'src/win_xp_error.mp3'
+mixer.music.load(sound_file_path)
+
+# Fenêtre d'erreur
+def message_erreur(erreur):
+    message_erreur_window = Toplevel(root.winfo_toplevel())
+    message_erreur_window.title("Erreur")
+    message_erreur_window.resizable(0, 0)
+    message_erreur_window.grab_set()
+    mixer.music.play()
+
+    erreur_image = PhotoImage(file="src/error.gif")
+    erreur_image_button = Button(message_erreur_window, image=erreur_image, command=lambda: mixer.music.play(), borderwidth=0)
+    erreur_image_button.image = erreur_image
+
+    erreur_image_button.grid(row=0, column=0, padx=(5, 0), pady=5)
+    erreur_label = Label(message_erreur_window, text=erreur)
+    erreur_label.grid(row=0, column=1, padx=(0,5), pady=5)
 
 # Obtenir l'entrée qui a été sélectionnée
 def entree_selectionnee(*_):
     try:
         iid = entrees_table.focus()
-        print(entrees_table.item(iid))
         name = entrees_table.item(iid)['values'][0]
     except IndexError:
         name = None
@@ -18,16 +41,29 @@ def entree_selectionnee(*_):
 
 # Supprimer une entrée du répertoire
 def remove():
+    # Si le répertoire n'est pas ouvert
+    if repertoire_ouvert == False:
+        message_erreur("Le répertoire n'est pas ouvert!")
+        return
+
     entree = entree_selectionnee()
     iid = entree[0]
     name = entree[1]
+
+    # Si aucune entrée n'a été cliquée
+    if not name:
+        message_erreur("Aucune entrée n'est sélectionnée!")
+        return
+
     rep.rem_rep(repertoire, name)
     entrees_table.delete(iid)
 
 # Ouvrir le répertoire
 def open_file():
     global repertoire, filename
-    filename = filedialog.askopenfilename()
+    filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
+    if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
+
     repertoire = rep.init_rep(filename)
     clear_table()
     for name in repertoire.keys():
@@ -36,10 +72,68 @@ def open_file():
         favorite = repertoire[name][2]
         entrees_table.insert(parent='',index='end', text='', values=(name, number, email, favorite))
 
+    global repertoire_ouvert
+    repertoire_ouvert = True
+
 # Réinitialise le tableau d'entrées
 def clear_table():
    for entree in entrees_table.get_children():
       entrees_table.delete(entree)
+
+# Ajouter l'élement au répertoire et l'affiche
+def add_and_insert(nom, numero, email, est_favori):
+    # Si l'entrée existe déjà dans le répertoire
+    if nom in repertoire:
+        message_erreur('Une entrée associée à ce nom existe déjà!'); return
+    # Si le nom est vide
+    if not nom:
+        message_erreur('Le nom ne peut pas être vide!'); return
+    # Si ni le numéro ni l'email n'a été donné
+    if not(numero or email):
+        message_erreur('Pas de numéro/email!'); return
+    # Si le numéro contient autre chose que des chiffres
+    numero = numero.strip()
+    if not numero.isdigit():
+        message_erreur('Numéro invalide!'); return
+
+    rep.add_rep(repertoire, nom, numero, email, est_favori)
+    entrees_table.insert(parent='',index='end', text='', values=(nom, numero, email, est_favori))
+
+# Ajouter une entrée au répertoire
+def add_dialog():
+    if repertoire_ouvert == False:
+        message_erreur("Le répertoire n'est pas ouvert!")
+        return
+
+    add_dialog_window = Toplevel(root)
+    add_dialog_window.title("Ajouter")
+    add_dialog_window.resizable(0, 0)
+
+    name_label = Label(add_dialog_window, text="Nom :")
+    number_label = Label(add_dialog_window, text="Numéro :")
+    email_label = Label(add_dialog_window, text="E-mail :")
+    favorite_label = Label(add_dialog_window, text="Favori ?")
+
+    name_label.grid(row=0, column=0, padx=5)
+    number_label.grid(row=1, column=0, padx=5)
+    email_label.grid(row=2, column=0, padx=5)
+    favorite_label.grid(row=3, column=0, padx=5)
+
+    name_entry = Entry(add_dialog_window)
+    number_entry = Entry(add_dialog_window)
+    email_entry = Entry(add_dialog_window)
+
+    est_favori = StringVar()
+    favorite_checkbox = Checkbutton(add_dialog_window, variable=est_favori, onvalue='★', offvalue='')
+
+    name_entry.grid(row=0, column=1, padx=5, pady=5)
+    number_entry.grid(row=1, column=1, padx=5, pady=(0,5))
+    email_entry.grid(row=2, column=1, padx=5, pady=(0,5))
+    favorite_checkbox.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
+
+    confirm_button = Button(add_dialog_window, text="Ajouter", command=lambda: add_and_insert(name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
+    confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
+
 
 # Fenêtre
 
@@ -58,7 +152,7 @@ save_button = Button(root, image=save_image, command=open, borderwidth=0)
 save_button.grid(row=0, column=1, padx=8)
 
 add_image = PhotoImage(file="src/add.png")
-add_button = Button(root, image=add_image, command=open, borderwidth=0)
+add_button = Button(root, image=add_image, command=add_dialog, borderwidth=0)
 add_button.grid(row=0, column=2, padx=8)
 
 remove_image = PhotoImage(file="src/remove.png")
