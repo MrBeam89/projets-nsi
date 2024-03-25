@@ -22,12 +22,12 @@ def list_rep(repertoire):
         print(f"{entree} : {repertoire[entree]}")
     return None
 
-# Ajouter une entrée au répertoire
-def add_rep(repertoire, nom, numero, email, favori):
-    repertoire[nom] = ['', '', '', '']
-    repertoire[nom][0] = numero
-    repertoire[nom][1] = email
-    repertoire[nom][2] = favori
+# Ajouter/modifier une entrée du répertoire
+def add_edit_rep(repertoire, nom, numero, email, favori):
+    repertoire[nom] = ['', '', '', ''] # Si entrée non existante -> Ajouter l'entrée
+    repertoire[nom][0] = numero        # Modifie le numéro
+    repertoire[nom][1] = email         # Modifie l'e-mail
+    repertoire[nom][2] = favori        # Modifie si favori ou non
     ES_csv.write_rep(repertoire, csv_filename)
 
 # Supprimer une entrée du répertoire
