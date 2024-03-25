@@ -16,6 +16,10 @@ def init_rep(filename):
         print(e)
         exit()
 
+# Sauvegarder le répertoire
+def save_rep(repertoire):
+    ES_csv.write_rep(repertoire, csv_filename)
+
 # Lister les entrées
 def list_rep(repertoire):
     for entree in repertoire.keys():
@@ -28,12 +32,10 @@ def add_edit_rep(repertoire, nom, numero, email, favori):
     repertoire[nom][0] = numero        # Modifie le numéro
     repertoire[nom][1] = email         # Modifie l'e-mail
     repertoire[nom][2] = favori        # Modifie si favori ou non
-    ES_csv.write_rep(repertoire, csv_filename)
 
 # Supprimer une entrée du répertoire
 def rem_rep(repertoire, nom):
     del repertoire[nom]
-    ES_csv.write_rep(repertoire, csv_filename)
 
 # Rechercher numéro d'après le nom
 def find_number(repertoire, nom):

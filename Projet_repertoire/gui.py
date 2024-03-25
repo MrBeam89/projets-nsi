@@ -60,19 +60,21 @@ def remove():
 
 # Créer un répertoire
 def new_file():
-    global repertoire
+    global repertoire, filename
     filename = filedialog.asksaveasfilename(filetypes=[("CSV files", "*.csv")])
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
     repertoire = rep.init_rep(filename)
     clear_table()
 
+    rep.save_rep({})
+
     global repertoire_ouvert
     repertoire_ouvert = True
 
 # Ouvrir le répertoire
 def open_file():
-    global repertoire
+    global repertoire, filename
     filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
@@ -117,6 +119,7 @@ def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
 
 # Ajouter une entrée au répertoire
 def add_dialog():
+    # Si le répertoire n'est pas ouvert
     if repertoire_ouvert == False:
         message_erreur("Le répertoire n'est pas ouvert!")
         return
@@ -156,6 +159,13 @@ def edit_dialog():
         message_erreur("Le répertoire n'est pas ouvert!")
         return
 
+    iid = entree_selectionnee()[0]
+    name = entree_selectionnee()[1]
+
+    if not name:
+        message_erreur("Aucune entrée n'est sélectionnée!")
+        return
+
     edit_dialog_window = Toplevel(root)
     edit_dialog_window.title("Modifier")
     edit_dialog_window.resizable(0, 0)
@@ -170,8 +180,6 @@ def edit_dialog():
     email_label.grid(row=2, column=0, padx=5)
     favorite_label.grid(row=3, column=0, padx=5)
 
-    iid = entree_selectionnee()[0]
-    name = entree_selectionnee()[1]
     number = repertoire[name][0]
     email = repertoire[name][1]
     est_favori = StringVar()
@@ -195,6 +203,13 @@ def edit_dialog():
     confirm_button = Button(edit_dialog_window, text="Enregistrer", command=lambda: add_or_edit_and_insert('edit', iid, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
     confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)    
 
+# Sauvegarder le répertoire
+def save():
+    if repertoire_ouvert == False:
+        message_erreur("Le répertoire n'est pas ouvert!")
+        return
+
+    rep.save_rep(repertoire)
 
 # Fenêtre
 
@@ -213,7 +228,7 @@ open_button = Button(root, image=open_image, command=open_file, borderwidth=0)
 open_button.grid(row=0, column=1, padx=8)
 
 save_image = PhotoImage(file="src/save.png")
-save_button = Button(root, image=save_image, command=open, borderwidth=0)
+save_button = Button(root, image=save_image, command=save, borderwidth=0)
 save_button.grid(row=0, column=2, padx=8)
 
 add_image = PhotoImage(file="src/add.png")
