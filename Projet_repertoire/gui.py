@@ -58,9 +58,21 @@ def remove():
     rep.rem_rep(repertoire, name)
     entrees_table.delete(iid)
 
+# Créer un répertoire
+def new_file():
+    global repertoire
+    filename = filedialog.asksaveasfilename(filetypes=[("CSV files", "*.csv")])
+    if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
+
+    repertoire = rep.init_rep(filename)
+    clear_table()
+
+    global repertoire_ouvert
+    repertoire_ouvert = True
+
 # Ouvrir le répertoire
 def open_file():
-    global repertoire, filename
+    global repertoire
     filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
@@ -90,7 +102,7 @@ def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
         message_erreur('Le nom ne peut pas être vide!'); return
     # Si ni le numéro ni l'email n'a été donné
     if not(numero or email):
-        message_erreur('Pas de numéro/email!'); return
+        message_erreur('Pas de numéro/e-mail!'); return
     # Si le numéro contient autre chose que des chiffres
     numero = numero.strip()
     if not numero.isdigit():
@@ -135,7 +147,7 @@ def add_dialog():
     email_entry.grid(row=2, column=1, padx=5, pady=(0,5))
     favorite_checkbox.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
 
-    confirm_button = Button(add_dialog_window, text="Ajouter", command=lambda: add_or_edit_and_insert('add', name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
+    confirm_button = Button(add_dialog_window, text="Ajouter", command=lambda: add_or_edit_and_insert('add', None, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
     confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
 # Modifier une entrée du répertoire
@@ -193,7 +205,7 @@ root.resizable(0, 0)
 # Boutons
 
 new_image = PhotoImage(file="src/new.png")
-new_button = Button(root, image=new_image, command=open, borderwidth=0)
+new_button = Button(root, image=new_image, command=new_file, borderwidth=0)
 new_button.grid(row=0, column=0, padx=(14,8), pady=8)
 
 open_image = PhotoImage(file="src/open.png")

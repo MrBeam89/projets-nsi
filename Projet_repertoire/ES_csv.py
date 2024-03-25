@@ -12,20 +12,17 @@ def read_rep(nomf:str)->dict:
 read_rep(nomf:str)->dict
 Retourne le reperoire contenu dans le fichier nomf.csv sous forme de dictionnaire
     """
-    try:
-        rep={}
-        # Ouverture du fichier nomf.csv en lecture
-        myfile = open(nomf,'rt')
-        myrep=csv.reader(myfile, delimiter=';', dialect='excel', lineterminator='\n')
-        # lecture du fichier
-        for row in myrep:
-            rep[row[0]]=[row[1],row[2],row[3]]
-        # Fermeture du fichier
-        myfile.close()
+    rep={}
+    # Ouverture du fichier nomf.csv en lecture
+    myfile = open(nomf,'rt')
+    myrep=csv.reader(myfile, delimiter=';', dialect='excel', lineterminator='\n')
+    # lecture du fichier
+    for row in myrep:
+        rep[row[0]]=[row[1],row[2],row[3]]
+    # Fermeture du fichier
+    myfile.close()
 
-        return rep
-    except Exception as e:
-        print(e)
+    return rep
 
 def write_rep(rep:dict,nomf:str)-> None:
     """

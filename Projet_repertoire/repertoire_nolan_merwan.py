@@ -3,9 +3,9 @@ import ES_csv
 # Initialiser le répertoire
 def init_rep(filename):
     # Essaye d'ouvrir le répertoire en format CSV. S'il n'existe pas, créé un nouveau répertoire
+    global csv_filename
     try:
         donnees = ES_csv.read_rep(filename)
-        global csv_filename
         csv_filename = filename
         return donnees
     except FileNotFoundError:
