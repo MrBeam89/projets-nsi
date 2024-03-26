@@ -14,7 +14,7 @@ Retourne le reperoire contenu dans le fichier nomf.csv sous forme de dictionnair
     """
     rep={}
     # Ouverture du fichier nomf.csv en lecture
-    myfile = open(nomf,'rt')
+    myfile = open(nomf,'rt', encoding="utf-8")
     myrep=csv.reader(myfile, delimiter=';', dialect='excel', lineterminator='\n')
     # lecture du fichier
     for row in myrep:
@@ -30,7 +30,7 @@ write_rep(rep:dict,nomf:str)->None
 Verse le contenu du repertoite rep (dictionnaire) dans le fichier nomf.csv
     """
     # Ouverture du fichier nomf.csv en écriture
-    myfile = open(nomf,'w')
+    myfile = open(nomf,'w', encoding="utf-8")
     mywriter = csv.writer(myfile, delimiter=';', dialect='excel', lineterminator='\n')
 
     # Ecriture du fichier

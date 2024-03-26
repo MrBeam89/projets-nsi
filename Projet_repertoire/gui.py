@@ -4,30 +4,35 @@ from tkinter import ttk
 from pygame import mixer # Pour le son
 import repertoire_nolan_merwan as rep
 
-global repertoire
-global repertoire_ouvert
+global repertoire, repertoire_ouvert, changements_effectues
 repertoire_ouvert = False
+changements_effectues = False
+
+ERROR_SFX_FILEPATH = "src/win_xp_error.mp3"
+WARNING_SFX_FILEPATH = "src/win_xp_warning.mp3"
+INFO_SFX_FILEPATH = "src/win_xp_info.mp3"
 
 # Easter egg
 mixer.init()
-sound_file_path = 'src/win_xp_error.mp3'
-mixer.music.load(sound_file_path)
 
-# Fenêtre d'erreur
-def message_erreur(erreur):
-    message_erreur_window = Toplevel(root.winfo_toplevel())
-    message_erreur_window.title("Erreur")
-    message_erreur_window.resizable(0, 0)
-    message_erreur_window.grab_set()
-    mixer.music.play()
+# Fenêtre popup
+def message_popup(titre, image, message, sound_file_path):
+    message_popup_window = Toplevel(root.winfo_toplevel())
+    message_popup_window.title(titre)
+    message_popup_window.resizable(0, 0)
+    message_popup_window.grab_set()
 
-    erreur_image = PhotoImage(file="src/error.gif")
-    erreur_image_button = Button(message_erreur_window, image=erreur_image, command=lambda: mixer.music.play(), borderwidth=0)
-    erreur_image_button.image = erreur_image
+    if sound_file_path:
+        mixer.music.load(sound_file_path)
+        mixer.music.play()
 
-    erreur_image_button.grid(row=0, column=0, padx=(5, 0), pady=5)
-    erreur_label = Label(message_erreur_window, text=erreur)
-    erreur_label.grid(row=0, column=1, padx=(0,5), pady=5)
+    popup_image = PhotoImage(file=image)
+    popup_image_button = Button(message_popup_window, image=popup_image, command=lambda: mixer.music.play(), borderwidth=0)
+    popup_image_button.image = popup_image
+
+    popup_image_button.grid(row=0, column=0, padx=(5, 0), pady=5)
+    popup_label = Label(message_popup_window, text=message)
+    popup_label.grid(row=0, column=1, padx=(0,5), pady=5)
 
 # Obtenir l'entrée qui a été sélectionnée
 def entree_selectionnee(*_):
@@ -43,7 +48,7 @@ def entree_selectionnee(*_):
 def remove():
     # Si le répertoire n'est pas ouvert
     if repertoire_ouvert == False:
-        message_erreur("Le répertoire n'est pas ouvert!")
+        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
         return
 
     entree = entree_selectionnee()
@@ -52,11 +57,14 @@ def remove():
 
     # Si aucune entrée n'a été cliquée
     if not name:
-        message_erreur("Aucune entrée n'est sélectionnée!")
+        message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH)
         return
 
     rep.rem_rep(repertoire, name)
     entrees_table.delete(iid)
+
+    global changements_effectues
+    changements_effectues = True
 
 # Créer un répertoire
 def new_file():
@@ -98,17 +106,17 @@ def clear_table():
 def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
     # Si l'entrée existe déjà dans le répertoire
     if nom in repertoire and operation == 'add':
-        message_erreur('Une entrée associée à ce nom existe déjà!'); return
+        message_popup("Erreur", "src/error.gif", 'Une entrée associée à ce nom existe déjà!', ERROR_SFX_FILEPATH); return
     # Si le nom est vide
     if not nom:
-        message_erreur('Le nom ne peut pas être vide!'); return
+        message_popup("Erreur", "src/error.gif", 'Le nom ne peut pas être vide!', ERROR_SFX_FILEPATH); return
     # Si ni le numéro ni l'email n'a été donné
     if not(numero or email):
-        message_erreur('Pas de numéro/e-mail!'); return
+        message_popup("Erreur", "src/error.gif", 'Pas de numéro/e-mail!', ERROR_SFX_FILEPATH); return
     # Si le numéro contient autre chose que des chiffres
     numero = numero.strip()
     if not numero.isdigit():
-        message_erreur('Numéro invalide!'); return
+        message_popup("Erreur", "src/error.gif", 'Numéro invalide!', ERROR_SFX_FILEPATH); return
 
     rep.add_edit_rep(repertoire, nom, numero, email, est_favori)
     if operation == 'add':
@@ -116,12 +124,15 @@ def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
     elif operation == 'edit':
         entrees_table.item(iid, values=(nom, numero, email, est_favori))
 
+    global changements_effectues
+    changements_effectues = True
+
 
 # Ajouter une entrée au répertoire
 def add_dialog():
     # Si le répertoire n'est pas ouvert
     if repertoire_ouvert == False:
-        message_erreur("Le répertoire n'est pas ouvert!")
+        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
         return
 
     add_dialog_window = Toplevel(root)
@@ -156,14 +167,14 @@ def add_dialog():
 # Modifier une entrée du répertoire
 def edit_dialog():
     if repertoire_ouvert == False:
-        message_erreur("Le répertoire n'est pas ouvert!")
+        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
         return
 
     iid = entree_selectionnee()[0]
     name = entree_selectionnee()[1]
 
     if not name:
-        message_erreur("Aucune entrée n'est sélectionnée!")
+        message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH)
         return
 
     edit_dialog_window = Toplevel(root)
@@ -201,15 +212,22 @@ def edit_dialog():
     favorite_checkbox.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
 
     confirm_button = Button(edit_dialog_window, text="Enregistrer", command=lambda: add_or_edit_and_insert('edit', iid, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
-    confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)    
+    confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
 # Sauvegarder le répertoire
 def save():
     if repertoire_ouvert == False:
-        message_erreur("Le répertoire n'est pas ouvert!")
+        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
+        return
+
+    global changements_effectues
+    if changements_effectues == False:
+        message_popup("Enregistrer", "src/save.png", "Aucun changement à enregistrer!", INFO_SFX_FILEPATH)
         return
 
     rep.save_rep(repertoire)
+    message_popup("Enregistrer", "src/save.png", "Changements enregistrés!", INFO_SFX_FILEPATH)
+    changements_effectues = False
 
 # Fenêtre
 
