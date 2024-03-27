@@ -68,8 +68,13 @@ def remove():
 
 # Créer un répertoire
 def new_file():
-    global repertoire, filename
-    filename = filedialog.asksaveasfilename(filetypes=[("CSV files", "*.csv")])
+    # Si des changements non-enregistrés ont été effectués
+    global repertoire, filename, changements_effectues, repertoire_ouvert
+    if changements_effectues == True:
+        message_popup("Avertissement", "src/warning.gif", "Des changements n'ont pas été sauvegardés!", "src/win_xp_warning.mp3")
+        return
+
+    filename = filedialog.asksaveasfilename(initialfile=".csv", filetypes=[("CSV files", "*.csv")])
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
     repertoire = rep.init_rep(filename)
@@ -77,12 +82,17 @@ def new_file():
 
     rep.save_rep({})
 
-    global repertoire_ouvert
     repertoire_ouvert = True
+    changements_effectues = False
 
 # Ouvrir le répertoire
 def open_file():
-    global repertoire, filename
+    # Si des changements non-enregistrés ont été effectués
+    global repertoire, filename, changements_effectues, repertoire_ouvert
+    if changements_effectues == True:
+        message_popup("Avertissement", "src/warning.gif", "Des changements n'ont pas été sauvegardés!", "src/win_xp_warning.mp3")
+        return
+
     filename = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
@@ -94,8 +104,8 @@ def open_file():
         favorite = repertoire[name][2]
         entrees_table.insert(parent='',index='end', text='', values=(name, number, email, favorite))
 
-    global repertoire_ouvert
     repertoire_ouvert = True
+    changements_effectues = False
 
 # Réinitialise le tableau d'entrées
 def clear_table():
