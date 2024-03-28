@@ -2,7 +2,7 @@ from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
 from pygame import mixer # Pour le son
-import repertoire_nolan_merwan as rep
+import rep_func as rep
 
 global repertoire, repertoire_ouvert, changements_effectues
 repertoire_ouvert = False
