@@ -34,6 +34,14 @@ def message_popup(titre, image, message, sound_file_path):
     popup_label = Label(message_popup_window, text=message)
     popup_label.grid(row=0, column=1, padx=(0,5), pady=5)
 
+# Vérifie si un répertoire est ouvert
+def repertoire_ouvert_verif():
+    if repertoire_ouvert == False:
+        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
+        return False
+    else:
+        return True
+
 # Obtenir l'entrée qui a été sélectionnée
 def entree_selectionnee(*_):
     try:
@@ -46,10 +54,8 @@ def entree_selectionnee(*_):
 
 # Supprimer une entrée du répertoire
 def remove():
-    # Si le répertoire n'est pas ouvert
-    if repertoire_ouvert == False:
-        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
-        return
+    # Vérifier qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
 
     entree = entree_selectionnee()
     iid = entree[0]
@@ -140,10 +146,8 @@ def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
 
 # Ajouter une entrée au répertoire
 def add_dialog():
-    # Si le répertoire n'est pas ouvert
-    if repertoire_ouvert == False:
-        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
-        return
+    # Vérifier qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
 
     add_dialog_window = Toplevel(root)
     add_dialog_window.title("Ajouter")
@@ -176,9 +180,8 @@ def add_dialog():
 
 # Modifier une entrée du répertoire
 def edit_dialog():
-    if repertoire_ouvert == False:
-        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
-        return
+    # Vérifie qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
 
     iid = entree_selectionnee()[0]
     name = entree_selectionnee()[1]
@@ -227,9 +230,8 @@ def edit_dialog():
 
 # Sauvegarder le répertoire
 def save():
-    if repertoire_ouvert == False:
-        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
-        return
+    # Vérifier qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
 
     global changements_effectues
     if changements_effectues == False:
