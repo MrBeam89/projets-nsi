@@ -82,6 +82,7 @@ def add_edit_rep(repertoire:dict, nom:str, numero:str, email:str, favori:str)->N
     {"Foo": ["789", "foo.bar@baz.com", ""], "Spam": ["456", "spam@eggs.com", ""]}
     '''
 
+    nom = str(nom)                     # Fix pour nom contenant que des chiffres
     repertoire[nom] = ['', '', '', ''] # Si entrée non existante -> Ajouter l'entrée (sinon écraser les données)
     repertoire[nom][0] = numero        # Ajouter/modifier le numéro
     repertoire[nom][1] = email         # Ajouter/modifier l'e-mail
@@ -106,7 +107,8 @@ def rem_rep(repertoire:dict, nom:str)->None:
     {"Spam": ["456", "spam@eggs.com", ""]}
     '''
 
-    del repertoire[nom]
+    nom = str(nom)      # Fix pour nom contenant que des chiffres
+    del repertoire[nom] # Supprimer l'entrée du dictionnaire
 
 
 def find_name(repertoire:dict, nom:str)->dict:
@@ -128,6 +130,7 @@ def find_name(repertoire:dict, nom:str)->dict:
     '''
 
     resultat = {}                          # Créer le dictionnaire des recherches
+    nom = str(nom)                         # Fix pour nom contenant que des chiffres
     for cle, valeur in repertoire.items(): # Pour chaque entrée dans le répertoire
         if cle.startswith(nom):            # Si le nom de l'entrée commence par les caractères donnés
                 resultat[cle] = valeur     # Rajouter cette entrée au dictionnaire des résultats

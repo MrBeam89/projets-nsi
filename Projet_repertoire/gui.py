@@ -60,7 +60,7 @@ def remove():
         message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH)
         return
 
-    rep.rem_rep(repertoire, name)
+    rep.rem_rep(repertoire, str(name))
     entrees_table.delete(iid)
 
     global changements_effectues
@@ -201,6 +201,7 @@ def edit_dialog():
     email_label.grid(row=2, column=0, padx=5)
     favorite_label.grid(row=3, column=0, padx=5)
 
+    name = str(name)
     number = repertoire[name][0]
     email = repertoire[name][1]
     est_favori = StringVar()
