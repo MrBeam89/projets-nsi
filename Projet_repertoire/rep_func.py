@@ -111,9 +111,9 @@ def rem_rep(repertoire:dict, nom:str)->None:
     del repertoire[nom] # Supprimer l'entrée du dictionnaire
 
 
-def find_name(repertoire:dict, nom:str)->dict:
+def search_name(repertoire:dict, nom:str)->dict:
     '''
-    Chercher toutes les entrées dans le répertoire dont le nom commence par une chaîne de caractères donnée
+    Chercher toutes les entrées dans le répertoire dont le nom contient une chaîne de caractères donnée
 
     Arguments :
     repertoire (dict) : Répertoire
@@ -124,7 +124,7 @@ def find_name(repertoire:dict, nom:str)->dict:
     
     Exemple :
     >>> repertoire = {"Foo": ["123", "foo@bar.com", "★"], "Spam": ["456", "spam@eggs.com", ""]}
-    >>> recherche = find_name(repertoire, "F")
+    >>> recherche = search_name(repertoire, "F")
     >>> print(recherche)
     {"Foo": ["123", "foo@bar.com", "★"]}
     '''
@@ -132,14 +132,14 @@ def find_name(repertoire:dict, nom:str)->dict:
     resultat = {}                          # Créer le dictionnaire des recherches
     nom = str(nom)                         # Fix pour nom contenant que des chiffres
     for cle, valeur in repertoire.items(): # Pour chaque entrée dans le répertoire
-        if cle.startswith(nom):            # Si le nom de l'entrée commence par les caractères donnés
+        if nom in cle:                     # Si le nom de l'entrée contient la chaîne donnée
                 resultat[cle] = valeur     # Rajouter cette entrée au dictionnaire des résultats
     return resultat                        # Renvoyer le résultat
 
 
-def find_number(repertoire:dict, numero:str)->dict:
+def search_number(repertoire:dict, numero:str)->dict:
     '''
-    Chercher toutes les entrées dans le répertoire dont le nom commence par une chaîne de caractères (contenant des chiffres) donnée
+    Chercher toutes les entrées dans le répertoire dont le nom contient une chaîne de caractères (contenant des chiffres) donnée
 
     Arguments :
     repertoire (dict) : Répertoire
@@ -150,21 +150,21 @@ def find_number(repertoire:dict, numero:str)->dict:
     
     Exemple :
     >>> repertoire = {"Foo": ["123", "foo@bar.com", "★"], "Spam": ["456", "spam@eggs.com", ""]}
-    >>> recherche = find_number(repertoire, "45")
+    >>> recherche = search_number(repertoire, "45")
     >>> print(recherche)
     {"Spam": ["456", "spam@eggs.com", ""]}
     '''
 
     resultat = {}
     for cle, valeur in repertoire.items(): # Pour chaque entrée dans le répertoire
-        if valeur[0].startswith(numero):   # Si le numéro de l'entrée commence par les chiffres donnés
+        if numero in valeur[0]:            # Si le numéro de l'entrée contient les chiffres donnés
             resultat[cle] = valeur         # Afficher l'entrée (élément 0 : nom; élément 1 : numéro)
     return resultat
 
 
-def find_email(repertoire:dict, email:str)->dict:
+def search_email(repertoire:dict, email:str)->dict:
     '''
-    Chercher toutes les entrées dans le répertoire dont l`e-mail commence par une chaîne de caractères donnée
+    Chercher toutes les entrées dans le répertoire dont l`e-mail contient une chaîne de caractères donnée
 
     Arguments :
     repertoire (dict) : Répertoire
@@ -175,19 +175,19 @@ def find_email(repertoire:dict, email:str)->dict:
     
     Exemple :
     >>> repertoire = {"Foo": ["123", "foo@bar.com", "★"], "Spam": ["456", "spam@eggs.com", ""]}
-    >>> recherche = find_email(repertoire, "foo@")
+    >>> recherche = search_email(repertoire, "foo@")
     >>> print(recherche)
     {"Foo": ["123", "foo@bar.com", "★"]}
     '''
 
     resultat = {}                          # Créer le dictionnaire des recherches
     for cle, valeur in repertoire.items(): # Pour chaque entrée dans le répertoire
-        if valeur[1].startswith(email):    # Si l'e-mail de l'entrée commence par la chaîne donnée
+        if email in valeur[1]:             # Si l'e-mail de l'entrée contient la chaîne donnée
             resultat[cle] = valeur         # Rajouter cette entrée au dictionnaire des résultats
     return resultat                        # Renvoyer le résultat
 
 
-def find_favorite(repertoire:dict, est_favori:bool)->dict:
+def search_favorite(repertoire:dict, est_favori:bool)->dict:
     '''
     Chercher toutes les entrées dans le répertoire qui font parti des favoris (ou pas)
 
@@ -200,7 +200,7 @@ def find_favorite(repertoire:dict, est_favori:bool)->dict:
     
     Exemple :
     >>> repertoire = {"Foo": ["123", "foo@bar.com", "★"], "Spam": ["456", "spam@eggs.com", ""]}
-    >>> recherche = find_email(repertoire, False)
+    >>> recherche = search_email(repertoire, False)
     >>> print(recherche)
     {"Spam": ["456", "spam@eggs.com", ""]}
     '''

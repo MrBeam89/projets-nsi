@@ -4,9 +4,10 @@ from tkinter import ttk
 from pygame import mixer # Pour le son
 import rep_func as rep
 
-global repertoire, repertoire_ouvert, changements_effectues
+global repertoire, repertoire_ouvert, changements_effectues, est_dans_recherche
 repertoire_ouvert = False
 changements_effectues = False
+est_dans_recherche = False
 
 ERROR_SFX_FILEPATH = "src/win_xp_error.mp3"
 WARNING_SFX_FILEPATH = "src/win_xp_warning.mp3"
@@ -84,7 +85,7 @@ def new_file():
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
     repertoire = rep.init_rep(filename)
-    clear_table()
+    clear_table_and_insert({})
 
     rep.save_rep({})
 
@@ -103,20 +104,22 @@ def open_file():
     if not filename: return # Si la boîte de dialogue a été fermée sans ouvrir de fichier
 
     repertoire = rep.init_rep(filename)
-    clear_table()
-    for name in repertoire.keys():
-        number = repertoire[name][0]
-        email = repertoire[name][1]
-        favorite = repertoire[name][2]
-        entrees_table.insert(parent='',index='end', text='', values=(name, number, email, favorite))
+    clear_table_and_insert(repertoire)
 
     repertoire_ouvert = True
     changements_effectues = False
 
 # Réinitialise le tableau d'entrées
-def clear_table():
-   for entree in entrees_table.get_children():
+def clear_table_and_insert(dic):
+    # Supprimer toutes les entrées à l'écran
+    for entree in entrees_table.get_children():
       entrees_table.delete(entree)
+    # Rajoute toutes les entrées dans le dictionnaire donné
+    for nom, valeur in dic.items():
+        numero = valeur[0]
+        email = valeur[1]
+        favori = valeur[2]
+        entrees_table.insert(parent='', index='end', text='', values=(nom, numero, email, favori))
 
 # Ajouter l'élement au répertoire et l'affiche
 def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
@@ -146,6 +149,11 @@ def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
 
 # Ajouter une entrée au répertoire
 def add_dialog():
+    # Si résultats d'une recherche affichés
+    if est_dans_recherche:
+        message_popup("Erreur", "src/error.gif", 'Ajout impossible dans résultats de recherche, veuillez réinitialiser la recherche!', "src/win_xp_error.mp3")
+        return
+
     # Vérifier qu'un répertoire est ouvert
     if not repertoire_ouvert_verif(): return
 
@@ -242,6 +250,79 @@ def save():
     message_popup("Enregistrer", "src/save.png", "Changements enregistrés!", INFO_SFX_FILEPATH)
     changements_effectues = False
 
+# Fenêtre de recherche
+def search_dialog():
+    # Vérifie qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
+
+    search_dialog_window = Toplevel(root)
+    search_dialog_window.title("Rechercher")
+    search_dialog_window.resizable(0, 0)
+
+    critere_recherche = StringVar()
+    name_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="nom")
+    numero_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="numero")
+    email_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="email")
+    favori_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="favori")
+
+    name_radiobutton.grid(row=0, column=0, padx=5)
+    numero_radiobutton.grid(row=1, column=0, padx=5)
+    email_radiobutton.grid(row=2, column=0, padx=5)
+    favori_radiobutton.grid(row=3, column=0, padx=5)
+
+    name_label = Label(search_dialog_window, text="Nom :")
+    number_label = Label(search_dialog_window, text="Numéro :")
+    email_label = Label(search_dialog_window, text="E-mail :")
+    favorite_label = Label(search_dialog_window, text="Favori ?")
+
+    name_label.grid(row=0, column=1, padx=(0,5))
+    number_label.grid(row=1, column=1, padx=(0,5))
+    email_label.grid(row=2, column=1, padx=(0,5))
+    favorite_label.grid(row=3, column=1, padx=(0,5))
+
+    name_entry = Entry(search_dialog_window)
+    number_entry = Entry(search_dialog_window)
+    email_entry = Entry(search_dialog_window)
+
+    est_favori = StringVar()
+    favorite_checkbox = Checkbutton(search_dialog_window, variable=est_favori, onvalue='★', offvalue='')
+
+    name_entry.grid(row=0, column=2, padx=5, pady=5)
+    number_entry.grid(row=1, column=2, padx=5, pady=(0,5))
+    email_entry.grid(row=2, column=2, padx=5, pady=(0,5))
+    favorite_checkbox.grid(row=3, column=2, padx=5, pady=(0,5), sticky='w')
+
+    button_frame = Frame(search_dialog_window)
+    button_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5)
+
+    search_button = Button(button_frame, text="Rechercher", command=lambda: search_and_insert(critere_recherche.get(), name_entry.get(), number_entry.get(), email_entry.get(), bool(est_favori.get())))
+    reset_button = Button(button_frame, text="Réinitialiser", command=reset_search)
+
+    search_button.grid(row=0, column=0, padx=5)
+    reset_button.grid(row=0, column=1, padx=5)
+
+# Réinitialiser les résultats d'une recherche
+def reset_search():
+    clear_table_and_insert(repertoire)
+    global est_dans_recherche
+    est_dans_recherche = False
+
+# Rechercher dans le répertoire et afficher le résultat
+def search_and_insert(critere, nom, numero, email, est_favori):
+    if not critere:
+        message_popup("Erreur", "src/error.gif", "Aucun critère n'est sélectionné!", ERROR_SFX_FILEPATH)
+        return
+
+    critere_commande = {"nom": '''resultat_recherche = rep.search_name(repertoire, nom); clear_table_and_insert(resultat_recherche)''',
+                        "numero": '''resultat_recherche = rep.search_number(repertoire, numero); clear_table_and_insert(resultat_recherche)''',
+                        "email": '''resultat_recherche = rep.search_email(repertoire, email); clear_table_and_insert(resultat_recherche)''',
+                        "favori": '''resultat_recherche = rep.search_favorite(repertoire, est_favori); clear_table_and_insert(resultat_recherche)'''}
+    exec(critere_commande[critere])
+
+    global est_dans_recherche
+    est_dans_recherche = True
+
+
 # Fenêtre
 
 root = Tk()
@@ -275,7 +356,7 @@ edit_button = Button(root, image=edit_image, command=edit_dialog, borderwidth=0)
 edit_button.grid(row=0, column=5, padx=8)
 
 search_image = PhotoImage(file="src/search.png")
-search_button = Button(root, image=search_image, command=open, borderwidth=0)
+search_button = Button(root, image=search_image, command=search_dialog, borderwidth=0)
 search_button.grid(row=0, column=6, padx=8)
 
 help_image = PhotoImage(file="src/help.png")
