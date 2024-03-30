@@ -59,7 +59,7 @@ def add_edit_rep(repertoire:dict, nom:str, numero:str, email:str, favori:str)->N
     '''
     Ajouter ou modifier une entrée du répertoire
 
-    Arguments :
+    Paramètres :
     repertoire (dict) : Répertoire
     nom (str) : Nom
     numero (str) : Numéro de téléphone
@@ -93,7 +93,7 @@ def rem_rep(repertoire:dict, nom:str)->None:
     '''
     Supprimer une entrée du répertoire avec le nom
 
-    Arguments :
+    Paramètres :
     repertoire (dict) : Répertoire
     nom (str) : Nom
 
@@ -115,7 +115,7 @@ def search_name(repertoire:dict, nom:str)->dict:
     '''
     Chercher toutes les entrées dans le répertoire dont le nom contient une chaîne de caractères donnée
 
-    Arguments :
+    Paramètres :
     repertoire (dict) : Répertoire
     nom (str) : Nom
 
@@ -141,7 +141,7 @@ def search_number(repertoire:dict, numero:str)->dict:
     '''
     Chercher toutes les entrées dans le répertoire dont le nom contient une chaîne de caractères (contenant des chiffres) donnée
 
-    Arguments :
+    Paramètres :
     repertoire (dict) : Répertoire
     numero (str) : Numéro de télélphone
 
@@ -166,7 +166,7 @@ def search_email(repertoire:dict, email:str)->dict:
     '''
     Chercher toutes les entrées dans le répertoire dont l`e-mail contient une chaîne de caractères donnée
 
-    Arguments :
+    Paramètres :
     repertoire (dict) : Répertoire
     email (str) : E-mail
 
@@ -191,7 +191,7 @@ def search_favorite(repertoire:dict, est_favori:bool)->dict:
     '''
     Chercher toutes les entrées dans le répertoire qui font parti des favoris (ou pas)
 
-    Arguments :
+    Paramètres :
     repertoire (dict) : Répertoire
     est_favori (bool) : Favori ou non-favori (True/False)
 

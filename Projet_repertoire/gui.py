@@ -1,3 +1,9 @@
+"""
+Fichier : gui.py
+Date : 30/03/2024
+Description : Repyrtoire (Gestion de répertoire avec GUI)
+"""
+
 from tkinter import *
 from tkinter import filedialog
 from tkinter import ttk
@@ -13,21 +19,33 @@ ERROR_SFX_FILEPATH = "src/win_xp_error.mp3"
 WARNING_SFX_FILEPATH = "src/win_xp_warning.mp3"
 INFO_SFX_FILEPATH = "src/win_xp_info.mp3"
 
-# Easter egg
+# Initialiser le lecteur de son
 mixer.init()
 
-# Fenêtre popup
-def message_popup(titre, image, message, sound_file_path):
+
+def message_popup(titre:str, image_file_path:str, message:str, sound_file_path:str)->None:
+    '''
+    Afficher une fenêtre popup contenant un message, une image et jouant un son
+
+    Paramètres :
+    - titre (str) : Titre de la fenêtre
+    - image_file_path (str) : Chemin d'accès à une image
+    - message (str) : Message à afficher
+    - sound_file_path (str) : Chemin d'accès au son à jouer
+
+    Renvoie :
+    None
+    '''
+    
     message_popup_window = Toplevel(root.winfo_toplevel())
     message_popup_window.title(titre)
     message_popup_window.resizable(0, 0)
     message_popup_window.grab_set()
 
-    if sound_file_path:
-        mixer.music.load(sound_file_path)
-        mixer.music.play()
+    mixer.music.load(sound_file_path)
+    mixer.music.play()
 
-    popup_image = PhotoImage(file=image)
+    popup_image = PhotoImage(file=image_file_path)
     popup_image_button = Button(message_popup_window, image=popup_image, command=lambda: mixer.music.play(), borderwidth=0)
     popup_image_button.image = popup_image
 
@@ -35,16 +53,35 @@ def message_popup(titre, image, message, sound_file_path):
     popup_label = Label(message_popup_window, text=message)
     popup_label.grid(row=0, column=1, padx=(0,5), pady=5)
 
-# Vérifie si un répertoire est ouvert
-def repertoire_ouvert_verif():
+
+def repertoire_ouvert_verif()->bool:
+    '''
+    Vérifier si un répertoire est ouvert, sinon afficher un message d'erreur
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    - bool : Répertoire ouvert/non-ouvert (True/False)
+    '''
+
     if repertoire_ouvert == False:
         message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
         return False
     else:
         return True
 
-# Obtenir l'entrée qui a été sélectionnée
-def entree_selectionnee(*_):
+
+def entree_selectionnee(*_)->tuple:
+    '''
+    Obtenir le nom de l'entrée sélectionnée et son identifiant dans le tableau
+
+    Paramètres :
+    - *_ : Aucun (ajouté pour éviter erreur)
+
+    Renvoie:
+    - (iid, name) (tuple) : Nom de l'entrée et son identifiant
+    '''
     try:
         iid = entrees_table.focus()
         name = entrees_table.item(iid)['values'][0]
@@ -53,32 +90,45 @@ def entree_selectionnee(*_):
     finally:
         return iid, name
 
-# Supprimer une entrée du répertoire
-def remove():
-    # Vérifier qu'un répertoire est ouvert
-    if not repertoire_ouvert_verif(): return
 
-    entree = entree_selectionnee()
-    iid = entree[0]
-    name = entree[1]
+def clear_table_and_insert(dic:dict)->None:
+    '''
+    Effacer tous les élements du tableau et insérer tous ceux dans le dictionnaire donné
 
-    # Si aucune entrée n'a été cliquée
-    if not name:
-        message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH)
-        return
+    Paramètres :
+    - dic (dict) : Répertoire ou résultats d'une recherche
 
-    rep.rem_rep(repertoire, str(name))
-    entrees_table.delete(iid)
+    Renvoie :
+    None
+    '''
 
-    global changements_effectues
-    changements_effectues = True
+    # Supprimer toutes les entrées à l'écran
+    for entree in entrees_table.get_children():
+      entrees_table.delete(entree)
 
-# Créer un répertoire
-def new_file():
+    # Rajouter toutes les entrées dans le dictionnaire donné
+    for nom, valeur in dic.items():
+        numero = valeur[0]
+        email = valeur[1]
+        favori = valeur[2]
+        entrees_table.insert(parent='', index='end', text='', values=(nom, numero, email, favori))
+
+
+def new_file()->None:
+    '''
+    Créer un nouveau répertoire et le charger
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
     # Si des changements non-enregistrés ont été effectués
     global repertoire, filename, changements_effectues, repertoire_ouvert
     if changements_effectues == True:
-        message_popup("Avertissement", "src/warning.gif", "Des changements n'ont pas été sauvegardés!", "src/win_xp_warning.mp3")
+        message_popup("Avertissement", "src/warning.gif", "Des changements n'ont pas été sauvegardés!", INFO_SFX_FILEPATH)
         return
 
     filename = filedialog.asksaveasfilename(initialfile=".csv", filetypes=[("CSV files", "*.csv")])
@@ -92,8 +142,18 @@ def new_file():
     repertoire_ouvert = True
     changements_effectues = False
 
-# Ouvrir le répertoire
-def open_file():
+
+def open_file()->None:
+    '''
+    Ouvrir un répertoire
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
     # Si des changements non-enregistrés ont été effectués
     global repertoire, filename, changements_effectues, repertoire_ouvert
     if changements_effectues == True:
@@ -109,26 +169,52 @@ def open_file():
     repertoire_ouvert = True
     changements_effectues = False
 
-# Réinitialise le tableau d'entrées
-def clear_table_and_insert(dic):
-    # Supprimer toutes les entrées à l'écran
-    for entree in entrees_table.get_children():
-      entrees_table.delete(entree)
-    # Rajoute toutes les entrées dans le dictionnaire donné
-    for nom, valeur in dic.items():
-        numero = valeur[0]
-        email = valeur[1]
-        favori = valeur[2]
-        entrees_table.insert(parent='', index='end', text='', values=(nom, numero, email, favori))
 
-# Ajouter l'élement au répertoire et l'affiche
-def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
+def save()->None:
+    '''
+    Enregistrer les changements apportés au répertoire (fonctionne uniquement si répertoire ouvert)
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
+    # Vérifier qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
+
+    global changements_effectues
+    if changements_effectues == False:
+        message_popup("Enregistrer", "src/save.png", "Aucun changement à enregistrer!", INFO_SFX_FILEPATH)
+        return
+
+    rep.save_rep(repertoire)
+    message_popup("Enregistrer", "src/save.png", "Changements enregistrés!", INFO_SFX_FILEPATH)
+    changements_effectues = False
+
+
+def add_or_edit_and_insert(operation:str, iid:int, nom:str, numero:str, email:str, favori:str)->None:
+    '''
+    Ajouter/modifier une entrée du répertoire et l'insérer dans le tableau des entrées
+
+    Paramètres :
+    - operation (str) : "add" ou "edit" (Ajouter/modifier)
+    - iid (int) : Identifiant de l'entrée dans le tableau des entrées
+    - nom (str) : Nom
+    - numero (str) : Numéro
+    - email (str) : E-mail
+    - favori (str) : '★' ou '' (Favori/non-favori)
+
+    Renvoie :
+    None
+    '''
+
     # Si l'entrée existe déjà dans le répertoire
-    if nom in repertoire and operation == 'add':
+    if nom in repertoire and operation == "add":
         message_popup("Erreur", "src/error.gif", 'Une entrée associée à ce nom existe déjà!', ERROR_SFX_FILEPATH); return
     # Si le nom est vide
-    if not nom:
-        message_popup("Erreur", "src/error.gif", 'Le nom ne peut pas être vide!', ERROR_SFX_FILEPATH); return
+    if not nom: message_popup("Erreur", "src/error.gif", 'Le nom ne peut pas être vide!', ERROR_SFX_FILEPATH); return
     # Si ni le numéro ni l'email n'a été donné
     if not(numero or email):
         message_popup("Erreur", "src/error.gif", 'Pas de numéro/e-mail!', ERROR_SFX_FILEPATH); return
@@ -137,18 +223,27 @@ def add_or_edit_and_insert(operation, iid, nom, numero, email, est_favori):
     if not numero.isdigit():
         message_popup("Erreur", "src/error.gif", 'Numéro invalide!', ERROR_SFX_FILEPATH); return
 
-    rep.add_edit_rep(repertoire, nom, numero, email, est_favori)
-    if operation == 'add':
-        entrees_table.insert(parent='',index='end', text='', values=(nom, numero, email, est_favori))
-    elif operation == 'edit':
-        entrees_table.item(iid, values=(nom, numero, email, est_favori))
+    rep.add_edit_rep(repertoire, nom, numero, email, favori)
+    if operation == "add":
+        entrees_table.insert(parent='',index='end', text='', values=(nom, numero, email, favori))
+    elif operation == "edit":
+        entrees_table.item(iid, values=(nom, numero, email, favori))
 
     global changements_effectues
     changements_effectues = True
 
 
-# Ajouter une entrée au répertoire
-def add_dialog():
+def add_dialog()->None:
+    '''
+    Fenêtre pour ajouter une entrée au répertoire (nom, numéro, e-mail, favori/non-favori) (s'ouvre uniquement si répertoire ouvert)
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
     # Si résultats d'une recherche affichés
     if est_dans_recherche:
         message_popup("Erreur", "src/error.gif", 'Ajout impossible dans résultats de recherche, veuillez réinitialiser la recherche!', "src/win_xp_error.mp3")
@@ -186,8 +281,48 @@ def add_dialog():
     confirm_button = Button(add_dialog_window, text="Ajouter", command=lambda: add_or_edit_and_insert('add', None, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
     confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
-# Modifier une entrée du répertoire
+
+def remove()->None:
+    '''
+    Supprimer l'entrée sélectionnée du répertoire et l'effacer du tableau des entrées
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
+    # Vérifier qu'un répertoire est ouvert
+    if not repertoire_ouvert_verif(): return
+
+    entree = entree_selectionnee()
+    iid = entree[0]
+    name = entree[1]
+
+    # Si aucune entrée n'a été cliquée
+    if not name:
+        message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH)
+        return
+
+    rep.rem_rep(repertoire, str(name))
+    entrees_table.delete(iid)
+
+    global changements_effectues
+    changements_effectues = True
+
+
 def edit_dialog():
+    '''
+    Fenêtre pour modifier une entrée au répertoire (numéro, e-mail, favori/non-favori) (s'ouvre uniquement si répertoire ouvert)
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
     # Vérifie qu'un répertoire est ouvert
     if not repertoire_ouvert_verif(): return
 
@@ -236,22 +371,68 @@ def edit_dialog():
     confirm_button = Button(edit_dialog_window, text="Enregistrer", command=lambda: add_or_edit_and_insert('edit', iid, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
     confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5)
 
-# Sauvegarder le répertoire
-def save():
-    # Vérifier qu'un répertoire est ouvert
-    if not repertoire_ouvert_verif(): return
 
-    global changements_effectues
-    if changements_effectues == False:
-        message_popup("Enregistrer", "src/save.png", "Aucun changement à enregistrer!", INFO_SFX_FILEPATH)
+def reset_search()->None:
+    '''
+    Réinitialiser les résultats d'une recherche
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
+    clear_table_and_insert(repertoire)
+    global est_dans_recherche
+    est_dans_recherche = False
+
+
+def search_and_insert(critere:str, nom:str, numero:str, email:str, est_favori:bool)->None:
+    '''
+    Rechercher selon le nom/numero/email/favori et affiche les résultats dans le tableau des entrées
+
+    Paramètres :
+    - critere (str) : "nom" ou "numero" ou "email" ou "favori"
+    - nom (str) : Nom
+    - numero (str) : Numéro
+    - email (str) : E-mail
+    - est_favori (bool) : Favori/non-favori (True/False)
+
+    Renvoie :
+    None
+    '''
+
+    if not critere:
+        message_popup("Erreur", "src/error.gif", "Aucun critère n'est sélectionné!", ERROR_SFX_FILEPATH)
         return
 
-    rep.save_rep(repertoire)
-    message_popup("Enregistrer", "src/save.png", "Changements enregistrés!", INFO_SFX_FILEPATH)
-    changements_effectues = False
+    if critere == "nom":
+        resultat_recherche = rep.search_name(repertoire, nom)
+    elif critere == "numero":
+        resultat_recherche = rep.search_number(repertoire, numero)
+    elif critere == "email":
+        resultat_recherche = rep.search_email(repertoire, email)
+    elif critere == "favori":
+        resultat_recherche = rep.search_favorite(repertoire, est_favori)
 
-# Fenêtre de recherche
-def search_dialog():
+    clear_table_and_insert(resultat_recherche)
+
+    global est_dans_recherche
+    est_dans_recherche = True
+
+
+def search_dialog()->None:
+    '''
+    Fenêtre de recherche (s'ouvre uniquement si répertoire ouvert)
+
+    Paramètres :
+    Aucun
+
+    Renvoie :
+    None
+    '''
+
     # Vérifie qu'un répertoire est ouvert
     if not repertoire_ouvert_verif(): return
 
@@ -301,29 +482,18 @@ def search_dialog():
     search_button.grid(row=0, column=0, padx=5)
     reset_button.grid(row=0, column=1, padx=5)
 
-# Réinitialiser les résultats d'une recherche
-def reset_search():
-    clear_table_and_insert(repertoire)
-    global est_dans_recherche
-    est_dans_recherche = False
 
-# Rechercher dans le répertoire et afficher le résultat
-def search_and_insert(critere, nom, numero, email, est_favori):
-    if not critere:
-        message_popup("Erreur", "src/error.gif", "Aucun critère n'est sélectionné!", ERROR_SFX_FILEPATH)
-        return
+def help_dialog()->None:
+    '''
+    Fenêtre d'aide avec une explication pour chaque bouton
 
-    critere_commande = {"nom": '''resultat_recherche = rep.search_name(repertoire, nom); clear_table_and_insert(resultat_recherche)''',
-                        "numero": '''resultat_recherche = rep.search_number(repertoire, numero); clear_table_and_insert(resultat_recherche)''',
-                        "email": '''resultat_recherche = rep.search_email(repertoire, email); clear_table_and_insert(resultat_recherche)''',
-                        "favori": '''resultat_recherche = rep.search_favorite(repertoire, est_favori); clear_table_and_insert(resultat_recherche)'''}
-    exec(critere_commande[critere])
+    Paramètres :
+    Aucun
 
-    global est_dans_recherche
-    est_dans_recherche = True
-
-# Fenêtre d'aide
-def help_dialog():
+    Renvoie :
+    None
+    '''
+    
     help_dialog_window = Toplevel(root)
     help_dialog_window.title("Aide")
     help_dialog_window.resizable(0,0)
@@ -358,18 +528,15 @@ def help_dialog():
     remove_text = "Supprimer une entrée du répertoire"
     edit_text = "Modifier une entrée du répertoire"
     search_text = "Chercher des entrées à partir du nom/numéro/e-mail/favoris"
-    help_text = "Cette fenêtre"
-
+    help_text = "Ouvrir cette fenêtre"
 
 
 # Fenêtre
-
 root = Tk()
 root.wm_title("Repyrtoire")
 root.resizable(0, 0)
 
 # Boutons
-
 new_image = PhotoImage(file="src/new.png")
 open_image = PhotoImage(file="src/open.png")
 save_image = PhotoImage(file="src/save.png")
@@ -398,7 +565,6 @@ search_button.grid(row=0, column=6, padx=8)
 help_button.grid(row=0, column=7, padx=8)
 
 # Tableau des entrées
-
 entrees_frame = Frame(root)
 entrees_frame.grid(row=1, column=0, columnspan=8)
 
@@ -422,11 +588,9 @@ entrees_table.bind('<ButtonRelease-1>', entree_selectionnee)
 entrees_table.pack(side=LEFT, fill=BOTH, expand=True)
 
 # Barre de défilement
-
 entrees_scrollbar = Scrollbar(entrees_frame, orient=VERTICAL, command=entrees_table.yview)
 entrees_table.configure(yscrollcommand=entrees_scrollbar.set)
 entrees_scrollbar.pack(side=RIGHT, fill=Y)
 
-
-
+# Boucle principale
 root.mainloop()
