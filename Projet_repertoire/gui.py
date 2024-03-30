@@ -322,6 +322,45 @@ def search_and_insert(critere, nom, numero, email, est_favori):
     global est_dans_recherche
     est_dans_recherche = True
 
+# Fenêtre d'aide
+def help_dialog():
+    help_dialog_window = Toplevel(root)
+    help_dialog_window.title("Aide")
+    help_dialog_window.resizable(0,0)
+
+    change_explanation_text = lambda text: explanation_label.config(text=text)
+
+    new_button = Button(help_dialog_window, image=new_image, borderwidth=0, command=lambda: change_explanation_text(new_text))
+    open_button = Button(help_dialog_window, image=open_image, borderwidth=0, command=lambda: change_explanation_text(open_text))
+    save_button = Button(help_dialog_window, image=save_image, borderwidth=0, command=lambda: change_explanation_text(save_text))
+    add_button = Button(help_dialog_window, image=add_image, borderwidth=0, command=lambda: change_explanation_text(add_text))
+    remove_button = Button(help_dialog_window, image=remove_image, borderwidth=0, command=lambda: change_explanation_text(remove_text))
+    edit_button = Button(help_dialog_window, image=edit_image, borderwidth=0, command=lambda: change_explanation_text(edit_text))
+    search_button = Button(help_dialog_window, image=search_image, borderwidth=0, command=lambda: change_explanation_text(search_text))
+    help_button = Button(help_dialog_window, image=help_image, borderwidth=0, command=lambda: change_explanation_text(help_text))
+
+    new_button.grid(row=0, column=0, padx=8, pady=8)
+    open_button.grid(row=0, column=1, padx=8)
+    save_button.grid(row=0, column=2, padx=8)
+    add_button.grid(row=0, column=3, padx=8)
+    remove_button.grid(row=0, column=4, padx=8)
+    edit_button.grid(row=0, column=5, padx=8)
+    search_button.grid(row=0, column=6, padx=8)
+    help_button.grid(row=0, column=7, padx=8)
+
+    explanation_label = Label(help_dialog_window, text="Cliquez sur une des icônes pour obtenir une explication")
+    explanation_label.grid(row=1, columnspan=8, pady=(0,8))
+
+    new_text = "Créer un nouveau répertoire dans un fichier au format CSV"
+    open_text = "Ouvrir un répertoire à partir d'un fichier au format CSV"
+    save_text = "Enregistrer les modifications faites au répertoire"
+    add_text = "Ajouter une entrée au répertoire"
+    remove_text = "Supprimer une entrée du répertoire"
+    edit_text = "Modifier une entrée du répertoire"
+    search_text = "Chercher des entrées à partir du nom/numéro/e-mail/favoris"
+    help_text = "Cette fenêtre"
+
+
 
 # Fenêtre
 
@@ -332,35 +371,30 @@ root.resizable(0, 0)
 # Boutons
 
 new_image = PhotoImage(file="src/new.png")
-new_button = Button(root, image=new_image, command=new_file, borderwidth=0)
-new_button.grid(row=0, column=0, padx=(14,8), pady=8)
-
 open_image = PhotoImage(file="src/open.png")
-open_button = Button(root, image=open_image, command=open_file, borderwidth=0)
-open_button.grid(row=0, column=1, padx=8)
-
 save_image = PhotoImage(file="src/save.png")
-save_button = Button(root, image=save_image, command=save, borderwidth=0)
-save_button.grid(row=0, column=2, padx=8)
-
 add_image = PhotoImage(file="src/add.png")
-add_button = Button(root, image=add_image, command=add_dialog, borderwidth=0)
-add_button.grid(row=0, column=3, padx=8)
-
 remove_image = PhotoImage(file="src/remove.png")
-remove_button = Button(root, image=remove_image, command=remove, borderwidth=0)
-remove_button.grid(row=0, column=4, padx=8)
-
 edit_image = PhotoImage(file="src/edit.png")
-edit_button = Button(root, image=edit_image, command=edit_dialog, borderwidth=0)
-edit_button.grid(row=0, column=5, padx=8)
-
 search_image = PhotoImage(file="src/search.png")
-search_button = Button(root, image=search_image, command=search_dialog, borderwidth=0)
-search_button.grid(row=0, column=6, padx=8)
-
 help_image = PhotoImage(file="src/help.png")
-help_button = Button(root, image=help_image, command=open, borderwidth=0)
+
+new_button = Button(root, image=new_image, command=new_file, borderwidth=0)
+open_button = Button(root, image=open_image, command=open_file, borderwidth=0)
+save_button = Button(root, image=save_image, command=save, borderwidth=0)
+add_button = Button(root, image=add_image, command=add_dialog, borderwidth=0)
+remove_button = Button(root, image=remove_image, command=remove, borderwidth=0)
+edit_button = Button(root, image=edit_image, command=edit_dialog, borderwidth=0)
+search_button = Button(root, image=search_image, command=search_dialog, borderwidth=0)
+help_button = Button(root, image=help_image, command=help_dialog, borderwidth=0)
+
+new_button.grid(row=0, column=0, padx=8, pady=8)
+open_button.grid(row=0, column=1, padx=8)
+save_button.grid(row=0, column=2, padx=8)
+add_button.grid(row=0, column=3, padx=8)
+remove_button.grid(row=0, column=4, padx=8)
+edit_button.grid(row=0, column=5, padx=8)
+search_button.grid(row=0, column=6, padx=8)
 help_button.grid(row=0, column=7, padx=8)
 
 # Tableau des entrées
