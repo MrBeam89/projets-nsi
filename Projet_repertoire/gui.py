@@ -18,7 +18,21 @@ repertoire_ouvert = False
 changements_effectues = False
 est_dans_recherche = False
 
-# Chemins d'accès au sons
+# Chemins d'accès aux images et sons
+NEW_ICON_FILEPATH = "src/new.png"
+OPEN_ICON_FILEPATH = "src/open.png"
+SAVE_ICON_FILEPATH = "src/save.png"
+ADD_ICON_FILEPATH = "src/add.png"
+REMOVE_ICON_FILEPATH = "src/remove.png"
+EDIT_ICON_FILEPATH = "src/edit.png"
+SEARCH_ICON_FILEPATH = "src/search.png"
+HELP_ICON_FILEPATH = "src/help.png"
+REPYRTOIRE_ICON_FILEPATH = "src/repyrtoire_icon.png"
+
+ERROR_ICON_FILEPATH = "src/error.gif"
+WARNING_ICON_FILEPATH = "src/warning.gif"
+INFO_ICON_FILEPATH = SAVE_ICON_FILEPATH # Utilisé uniquement pour enregistrer
+
 ERROR_SFX_FILEPATH = "src/win_xp_error.mp3"
 WARNING_SFX_FILEPATH = "src/win_xp_warning.mp3"
 INFO_SFX_FILEPATH = "src/win_xp_info.mp3"
@@ -91,7 +105,7 @@ def repertoire_ouvert_verif()->bool:
     # Si le répertoire n'est pas ouvert
     if repertoire_ouvert == False:
         # Afficher un message d'erreur
-        message_popup("Erreur", "src/error.gif", "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
+        message_popup("Erreur", ERROR_ICON_FILEPATH, "Le répertoire n'est pas ouvert!", ERROR_SFX_FILEPATH)
         return False
     else:
         return True
@@ -155,7 +169,7 @@ def nouveau_repertoire()->None:
 
     # Si des changements non-enregistrés ont été effectués
     if changements_effectues == True:
-        message_popup("Avertissement", "src/warning.gif", "Des changements n'ont pas été sauvegardés!", INFO_SFX_FILEPATH)
+        message_popup("Avertissement", WARNING_ICON_FILEPATH, "Des changements n'ont pas été sauvegardés!", INFO_SFX_FILEPATH)
         return
 
     # Obtenir un chemin d'accès au fichier à créer
@@ -185,7 +199,7 @@ def ouvrir_repertoire()->None:
     # Si des changements non-enregistrés ont été effectués
     global repertoire, filename, changements_effectues, repertoire_ouvert
     if changements_effectues == True:
-        message_popup("Avertissement", "src/warning.gif", "Des changements n'ont pas été sauvegardés!", "src/win_xp_warning.mp3")
+        message_popup("Avertissement", WARNING_ICON_FILEPATH, "Des changements n'ont pas été sauvegardés!", WARNING_SFX_FILEPATH)
         return
 
     # Obtenir le chemin d'accès au répertoire
@@ -218,12 +232,12 @@ def enregistrer()->None:
     # Si aucun changement non-enregistré
     global changements_effectues
     if changements_effectues == False:
-        message_popup("Enregistrer", "src/save.png", "Aucun changement à enregistrer!", INFO_SFX_FILEPATH)
+        message_popup("Enregistrer", SAVE_ICON_FILEPATH, "Aucun changement à enregistrer!", INFO_SFX_FILEPATH)
         return
 
     # Si changements non-enregistrés
     rep.save_rep(repertoire) # Enregistrer le répertoire dans le fichier
-    message_popup("Enregistrer", "src/save.png", "Changements enregistrés!", INFO_SFX_FILEPATH) # Afficher un message via une fenêtre pop-up
+    message_popup("Enregistrer", SAVE_ICON_FILEPATH, "Changements enregistrés!", INFO_SFX_FILEPATH) # Afficher un message via une fenêtre pop-up
     changements_effectues = False # Ne pas avertir de changement non-enregistré
 
 
@@ -250,28 +264,28 @@ def ajouter_ou_modifier_et_inserer(operation:str, iid:int, nom:str, numero:str, 
 
     # Si l'entrée existe déjà dans le répertoire
     if nom in repertoire and operation == "add":
-        message_popup("Erreur", "src/error.gif", 'Une entrée associée à ce nom existe déjà!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, 'Une entrée associée à ce nom existe déjà!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter
 
     # Si le nom est vide
     if not nom:
-        message_popup("Erreur", "src/error.gif", 'Le nom ne peut pas être vide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, 'Le nom ne peut pas être vide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter/modifier
 
     # Si ni le numéro ni l'email n'a été donné
     if not(numero or email):
-        message_popup("Erreur", "src/error.gif", 'Pas de numéro/e-mail!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, 'Pas de numéro/e-mail!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter/modifier
 
     # Si un numéro a été donné mais qu'il contient autre chose que des chiffres
     if numero and not numero.isdigit():
-        message_popup("Erreur", "src/error.gif", 'Numéro invalide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, 'Numéro invalide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter/modifier
 
     # Si une adresse e-mail a été donnée mais qu'elle est invalide
     email = email.strip()
     if email and not email_valide_verif(email):
-        message_popup("Erreur", "src/error.gif", 'E-mail invalide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, 'E-mail invalide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter/modifier
 
     # Ajouter/modifier l'entrée dans le répertoire si aucune erreur n'est détectée
@@ -303,7 +317,7 @@ def ouvrir_fenetre_ajouter()->None:
 
     # Si résultats d'une recherche affichés
     if est_dans_recherche:
-        message_popup("Erreur", "src/error.gif", 'Ajout impossible dans résultats de recherche, veuillez réinitialiser la recherche!', "src/win_xp_error.mp3")
+        message_popup("Erreur", ERROR_ICON_FILEPATH, 'Ajout impossible dans résultats de recherche, veuillez réinitialiser la recherche!', ERROR_SFX_FILEPATH)
         return
 
     # Vérifier qu'un répertoire est ouvert
@@ -367,7 +381,7 @@ def supprimer_entree()->None:
 
     # Si aucune entrée n'a été cliquée
     if not name:
-        message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas supprimer
 
     # Supprimer l'entrée
@@ -400,7 +414,7 @@ def ouvrir_fenetre_modifier():
 
     # Si aucune entrée n'est sélectionnée
     if not name:
-        message_popup("Erreur", "src/error.gif", "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, "Aucune entrée n'est sélectionnée!", ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas affiche la fenêtre de modification
 
     # Caractéristiques de la fenêtre
@@ -488,7 +502,7 @@ def rechercher_et_inserer(critere:str, nom:str, numero:str, email:str, est_favor
 
     # Si aucun critère n'est sélectionné
     if not critere:
-        message_popup("Erreur", "src/error.gif", "Aucun critère n'est sélectionné!", ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        message_popup("Erreur", ERROR_ICON_FILEPATH, "Aucun critère n'est sélectionné!", ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas effectuer de recherche
 
     # Rechercher en fonction du critère sélectionné
@@ -602,7 +616,7 @@ def ouvrir_fenetre_aide()->None:
     repyrtoire_cadre.grid(row=0, column=0, columnspan=8, pady=8) # Placer le cadre en haut et prendre la même longueur que les boutons d'actions
 
     # Bouton-image Repyrtoire
-    repyrtoire_icone_image = PhotoImage(file="src/repyrtoire_icon.png")
+    repyrtoire_icone_image = PhotoImage(file=REPYRTOIRE_ICON_FILEPATH)
     repyrtoire_icone_bouton = Button(repyrtoire_cadre, image=repyrtoire_icone_image, borderwidth=0, command=lambda: webbrowser.open_new("https://github.com/MrBeam89/projets-nsi")) # Easter egg
     repyrtoire_icone_bouton.image = repyrtoire_icone_image # Pour éviter que le ramasse-miettes de Python supprime l'image
     
@@ -659,14 +673,14 @@ fenetre_principale.wm_title("Repyrtoire") # Titre de la fenêtre
 fenetre_principale.resizable(0, 0) # Taille non-modifiable
 
 # Images pour les boutons d'actions (réutilisées dans la fenêtre d'aide)
-nouveau_repertoire_image = PhotoImage(file="src/new.png")
-ouvrir_repertoire_image = PhotoImage(file="src/open.png")
-enregistrer_image = PhotoImage(file="src/save.png")
-ajouter_image = PhotoImage(file="src/add.png")
-supprimer_image = PhotoImage(file="src/remove.png")
-modifier_image = PhotoImage(file="src/edit.png")
-rechercher_image = PhotoImage(file="src/search.png")
-aide_image = PhotoImage(file="src/help.png")
+nouveau_repertoire_image = PhotoImage(file=NEW_ICON_FILEPATH)
+ouvrir_repertoire_image = PhotoImage(file=OPEN_ICON_FILEPATH)
+enregistrer_image = PhotoImage(file=SAVE_ICON_FILEPATH)
+ajouter_image = PhotoImage(file=ADD_ICON_FILEPATH)
+supprimer_image = PhotoImage(file=REMOVE_ICON_FILEPATH)
+modifier_image = PhotoImage(file=EDIT_ICON_FILEPATH)
+rechercher_image = PhotoImage(file=SEARCH_ICON_FILEPATH)
+aide_image = PhotoImage(file=HELP_ICON_FILEPATH)
 
 # Boutons d'actions
 nouveau_repertoire_bouton = Button(fenetre_principale, image=nouveau_repertoire_image, command=nouveau_repertoire, borderwidth=0)
