@@ -169,7 +169,7 @@ def nouveau_repertoire()->None:
 
     # Si des changements non-enregistrés ont été effectués
     if changements_effectues == True:
-        message_popup("Avertissement", WARNING_ICON_FILEPATH, "Des changements n'ont pas été sauvegardés!", INFO_SFX_FILEPATH)
+        message_popup("Avertissement", WARNING_ICON_FILEPATH, "Des changements n'ont pas été sauvegardés!", WARNING_SFX_FILEPATH)
         return
 
     # Obtenir un chemin d'accès au fichier à créer
