@@ -56,10 +56,10 @@ def message_popup(titre:str, image_file_path:str, message:str, sound_file_path:s
     '''
     
     # Caractéristiques de la fenêtre
-    message_popup_window = Toplevel(root.winfo_toplevel()) # Toujours au-dessus de la fenêtre le plus au-dessus
-    message_popup_window.title(titre) # Titre de la fenêtre
-    message_popup_window.resizable(0, 0) # Taille non-modifiable
-    message_popup_window.grab_set() # Rendre impossible interaction avec les autres fenêtres tant que celle-ci n'est pas fermée
+    fenetre_message_popup = Toplevel(fenetre_principale.winfo_toplevel()) # Toujours au-dessus de la fenêtre le plus au-dessus
+    fenetre_message_popup.title(titre) # Titre de la fenêtre
+    fenetre_message_popup.resizable(0, 0) # Taille non-modifiable
+    fenetre_message_popup.grab_set() # Rendre impossible interaction avec les autres fenêtres tant que celle-ci n'est pas fermée
 
     # Jouer un son
     mixer.music.load(sound_file_path) # Charger le son
@@ -67,12 +67,12 @@ def message_popup(titre:str, image_file_path:str, message:str, sound_file_path:s
 
     # Image
     popup_image = PhotoImage(file=image_file_path) # Ouvrir l'image à partir du chemin d'accès au fichier
-    popup_image_button = Button(message_popup_window, image=popup_image, command=lambda: mixer.music.play(), borderwidth=0) # Bouton-image qui joue le son lorsqu'il est cliqué
+    popup_image_button = Button(fenetre_message_popup, image=popup_image, command=lambda: mixer.music.play(), borderwidth=0) # Bouton-image qui joue le son lorsqu'il est cliqué
     popup_image_button.image = popup_image # Pour éviter que le ramasse-miettes de Python supprime l'image
     popup_image_button.grid(row=0, column=0, padx=(5, 0), pady=5) # Placer l'image à gauche du message sur la même ligne
 
     # Message
-    popup_label = Label(message_popup_window, text=message) # Message donné en paramètre
+    popup_label = Label(fenetre_message_popup, text=message) # Message donné en paramètre
     popup_label.grid(row=0, column=1, padx=(0,5), pady=5) # Placer le message à droite de l'image sur la même ligne
 
 
@@ -108,15 +108,15 @@ def entree_selectionnee(*_)->tuple:
     '''
 
     try:
-        iid = entrees_table.focus() # Obtenir l'identifiant de l'entrée sélectionnée dans le tableau
-        name = entrees_table.item(iid)['values'][0] # Obtenir le nom de l'entrée
+        iid = entrees_tableau.focus() # Obtenir l'identifiant de l'entrée sélectionnée dans le tableau
+        name = entrees_tableau.item(iid)['values'][0] # Obtenir le nom de l'entrée
     except IndexError: # Si l'en-tête du tableau est cliqué
         name = None
     finally:
         return iid, name # Renvoyer l'identifiant et le nom
 
 
-def clear_table_and_insert(dic:dict)->None:
+def effacer_tableau_et_inserer(dic:dict)->None:
     '''
     Effacer tous les élements du tableau et insérer tous ceux dans le dictionnaire donné
 
@@ -128,18 +128,18 @@ def clear_table_and_insert(dic:dict)->None:
     '''
 
     # Supprimer toutes les entrées à l'écran
-    for entree in entrees_table.get_children():
-      entrees_table.delete(entree)
+    for entree in entrees_tableau.get_children():
+      entrees_tableau.delete(entree)
 
     # Rajouter toutes les entrées dans le dictionnaire donné
     for nom, valeur in dic.items(): # Pour chaque entrée dans le dictionnaire
         numero = valeur[0]
         email = valeur[1]
         favori = valeur[2]
-        entrees_table.insert(parent='', index='end', text='', values=(nom, numero, email, favori)) # Insérer l'entrée dans le tableau des entrées
+        entrees_tableau.insert(parent='', index='end', text='', values=(nom, numero, email, favori)) # Insérer l'entrée dans le tableau des entrées
 
 
-def new_file()->None:
+def nouveau_repertoire()->None:
     '''
     Créer un nouveau répertoire et le charger
 
@@ -163,14 +163,14 @@ def new_file()->None:
 
     # Créer le répertoire et réinitialiser le tableau des entrées
     repertoire = rep.init_rep(filename)
-    clear_table_and_insert(repertoire)
+    effacer_tableau_et_inserer(repertoire)
 
     # Activer les fonctions de modification/recherche
     repertoire_ouvert = True
     changements_effectues = False
 
 
-def open_file()->None:
+def ouvrir_repertoire()->None:
     '''
     Ouvrir un répertoire
 
@@ -193,14 +193,14 @@ def open_file()->None:
 
     # Ouvrir le répertoire, réinitialiser le tableau des entrées et insérer le contenu du répertoire dedans
     repertoire = rep.init_rep(filename)
-    clear_table_and_insert(repertoire)
+    effacer_tableau_et_inserer(repertoire)
 
     # Activer les fonctions de modification/recherche
     repertoire_ouvert = True
     changements_effectues = False
 
 
-def save()->None:
+def enregistrer()->None:
     '''
     Enregistrer les changements apportés au répertoire (fonctionne uniquement si répertoire ouvert)
 
@@ -226,7 +226,7 @@ def save()->None:
     changements_effectues = False # Ne pas avertir de changement non-enregistré
 
 
-def add_or_edit_and_insert(operation:str, iid:int, nom:str, numero:str, email:str, favori:str)->None:
+def ajouter_ou_modifier_et_inserer(operation:str, iid:int, nom:str, numero:str, email:str, favori:str)->None:
     '''
     Ajouter/modifier une entrée du répertoire et l'insérer dans le tableau des entrées
 
@@ -278,18 +278,18 @@ def add_or_edit_and_insert(operation:str, iid:int, nom:str, numero:str, email:st
 
     # Si l'opération est un ajout
     if operation == "add":
-        entrees_table.insert(parent='',index='end', text='', values=(nom, numero, email, favori)) # Ajouter l'entrée dans le tableau des entrées
+        entrees_tableau.insert(parent='',index='end', text='', values=(nom, numero, email, favori)) # Ajouter l'entrée dans le tableau des entrées
     
     # Si l'opération est une modification
     elif operation == "edit":
-        entrees_table.item(iid, values=(nom, numero, email, favori)) # Modifier les informations de l'entrée dans le tableau des entrées
+        entrees_tableau.item(iid, values=(nom, numero, email, favori)) # Modifier les informations de l'entrée dans le tableau des entrées
 
     # Pour prévenir de changement non-enregistré
     global changements_effectues
     changements_effectues = True
 
 
-def add_dialog()->None:
+def ouvrir_fenetre_ajouter()->None:
     '''
     Fenêtre pour ajouter une entrée au répertoire (nom, numéro, e-mail, favori/non-favori) (s'ouvre uniquement si répertoire ouvert)
 
@@ -309,43 +309,43 @@ def add_dialog()->None:
     if not repertoire_ouvert_verif(): return
 
     # Caractéristiques de la fenêtre
-    add_dialog_window = Toplevel(root) # Fenêtre au-dessus de la fenêtre principale
-    add_dialog_window.title("Ajouter") # Titre de la fenêtre
-    add_dialog_window.resizable(0, 0)  # Taille non-modifiable
+    fenetre_ajouter = Toplevel(fenetre_principale) # Fenêtre au-dessus de la fenêtre principale
+    fenetre_ajouter.title("Ajouter") # Titre de la fenêtre
+    fenetre_ajouter.resizable(0, 0)  # Taille non-modifiable
 
     # Textes à côté des champs de saisie
-    name_label = Label(add_dialog_window, text="Nom :")
-    number_label = Label(add_dialog_window, text="Numéro :")
-    email_label = Label(add_dialog_window, text="E-mail :")
-    favorite_label = Label(add_dialog_window, text="Favori ?")
+    nom_texte = Label(fenetre_ajouter, text="Nom :")
+    numero_texte = Label(fenetre_ajouter, text="Numéro :")
+    email_texte = Label(fenetre_ajouter, text="E-mail :")
+    favori_texte = Label(fenetre_ajouter, text="Favori ?")
 
     # Placer les textes en colonne tout à gauche
-    name_label.grid(row=0, column=0, padx=5)
-    number_label.grid(row=1, column=0, padx=5)
-    email_label.grid(row=2, column=0, padx=5)
-    favorite_label.grid(row=3, column=0, padx=5)
+    nom_texte.grid(row=0, column=0, padx=5)
+    numero_texte.grid(row=1, column=0, padx=5)
+    email_texte.grid(row=2, column=0, padx=5)
+    favori_texte.grid(row=3, column=0, padx=5)
 
     # Champs de saisie
-    name_entry = Entry(add_dialog_window)
-    number_entry = Entry(add_dialog_window)
-    email_entry = Entry(add_dialog_window)
+    nom_champ_de_saisie = Entry(fenetre_ajouter)
+    numero_champ_de_saisie = Entry(fenetre_ajouter)
+    email_champ_de_saisie = Entry(fenetre_ajouter)
 
     # Case à cocher pour favori
     est_favori = StringVar()
-    favorite_checkbox = Checkbutton(add_dialog_window, variable=est_favori, onvalue='★', offvalue='')
+    favori_case_a_cocher = Checkbutton(fenetre_ajouter, variable=est_favori, onvalue='★', offvalue='')
 
     # Placer les champs de saisie et la case à cocher dans la même colonne tout à droite
-    name_entry.grid(row=0, column=1, padx=5, pady=5)
-    number_entry.grid(row=1, column=1, padx=5, pady=(0,5))
-    email_entry.grid(row=2, column=1, padx=5, pady=(0,5))
-    favorite_checkbox.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
+    nom_champ_de_saisie.grid(row=0, column=1, padx=5, pady=5)
+    numero_champ_de_saisie.grid(row=1, column=1, padx=5, pady=(0,5))
+    email_champ_de_saisie.grid(row=2, column=1, padx=5, pady=(0,5))
+    favori_case_a_cocher.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
 
     # Bouton d'ajout
-    confirm_button = Button(add_dialog_window, text="Ajouter", command=lambda: add_or_edit_and_insert('add', None, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
-    confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5) # Placer le bouton en bas au centre de la fenêtre
+    ajout_bouton = Button(fenetre_ajouter, text="Ajouter", command=lambda: ajouter_ou_modifier_et_inserer('add', None, nom_champ_de_saisie.get(), numero_champ_de_saisie.get(), email_champ_de_saisie.get(), est_favori.get()))
+    ajout_bouton.grid(row=4, column=0, columnspan=2, padx=5, pady=5) # Placer le bouton en bas au centre de la fenêtre
 
 
-def remove()->None:
+def supprimer_entree()->None:
     '''
     Supprimer l'entrée sélectionnée du répertoire et l'effacer du tableau des entrées
 
@@ -371,14 +371,14 @@ def remove()->None:
 
     # Supprimer l'entrée
     rep.rem_rep(repertoire, str(name)) # Supprimer l'entrée du répertoire
-    entrees_table.delete(iid) # Supprimer l'entrée du tableau
+    entrees_tableau.delete(iid) # Supprimer l'entrée du tableau
 
     # Pour prévenir de changement non-enregistré
     global changements_effectues
     changements_effectues = True
 
 
-def edit_dialog():
+def ouvrir_fenetre_modifier():
     '''
     Fenêtre pour modifier une entrée au répertoire (numéro, e-mail, favori/non-favori) (s'ouvre uniquement si répertoire ouvert)
 
@@ -403,21 +403,21 @@ def edit_dialog():
         return # Ne pas affiche la fenêtre de modification
 
     # Caractéristiques de la fenêtre
-    edit_dialog_window = Toplevel(root)  # Fenêtre au-dessus de la fenêtre principale
-    edit_dialog_window.title("Modifier") # Titre de la fenêtre
-    edit_dialog_window.resizable(0, 0)   # Taille non-modifiable
+    fenetre_modifier = Toplevel(fenetre_principale)  # Fenêtre au-dessus de la fenêtre principale
+    fenetre_modifier.title("Modifier") # Titre de la fenêtre
+    fenetre_modifier.resizable(0, 0)   # Taille non-modifiable
 
     # Texte à côté des champs de saisie
-    name_label = Label(edit_dialog_window, text="Nom :")
-    number_label = Label(edit_dialog_window, text="Numéro :")
-    email_label = Label(edit_dialog_window, text="E-mail :")
-    favorite_label = Label(edit_dialog_window, text="Favori ?")
+    nom_texte = Label(fenetre_modifier, text="Nom :")
+    numero_texte = Label(fenetre_modifier, text="Numéro :")
+    email_texte = Label(fenetre_modifier, text="E-mail :")
+    favori_texte = Label(fenetre_modifier, text="Favori ?")
 
     # Placer les textes en colonne tout à gauche
-    name_label.grid(row=0, column=0, padx=5)
-    number_label.grid(row=1, column=0, padx=5)
-    email_label.grid(row=2, column=0, padx=5)
-    favorite_label.grid(row=3, column=0, padx=5)
+    nom_texte.grid(row=0, column=0, padx=5)
+    numero_texte.grid(row=1, column=0, padx=5)
+    email_texte.grid(row=2, column=0, padx=5)
+    favori_texte.grid(row=3, column=0, padx=5)
 
     # Récuperer les informations de l'entrée
     name = str(name)
@@ -427,31 +427,31 @@ def edit_dialog():
     est_favori.set(repertoire[name][2])
 
     # Champs de saisie
-    name_entry = Entry(edit_dialog_window)
-    number_entry = Entry(edit_dialog_window)
-    email_entry = Entry(edit_dialog_window)
+    nom_champ_de_saisie = Entry(fenetre_modifier)
+    numero_champ_de_saisie = Entry(fenetre_modifier)
+    email_champ_de_saisie = Entry(fenetre_modifier)
 
     # Insérer les informations de l'entrée dans les champs de saisie
-    name_entry.insert(END, name)
-    name_entry.config(state=DISABLED) # Empêcher la modification du nom
-    number_entry.insert(END, number)
-    email_entry.insert(END, email)
+    nom_champ_de_saisie.insert(END, name)
+    nom_champ_de_saisie.config(state=DISABLED) # Empêcher la modification du nom
+    numero_champ_de_saisie.insert(END, number)
+    email_champ_de_saisie.insert(END, email)
 
     # Case à cocher pour favori et cocher/décocher si favori/non-favori
-    favorite_checkbox = Checkbutton(edit_dialog_window, variable=est_favori, onvalue='★', offvalue='')
+    favori_case_a_cocher = Checkbutton(fenetre_modifier, variable=est_favori, onvalue='★', offvalue='')
 
     # Placer les champs de saisie et la case à cocher dans la même colonne tout à droite
-    name_entry.grid(row=0, column=1, padx=5, pady=5)
-    number_entry.grid(row=1, column=1, padx=5, pady=(0,5))
-    email_entry.grid(row=2, column=1, padx=5, pady=(0,5))
-    favorite_checkbox.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
+    nom_champ_de_saisie.grid(row=0, column=1, padx=5, pady=5)
+    numero_champ_de_saisie.grid(row=1, column=1, padx=5, pady=(0,5))
+    email_champ_de_saisie.grid(row=2, column=1, padx=5, pady=(0,5))
+    favori_case_a_cocher.grid(row=3, column=1, padx=5, pady=(0,5), sticky='w')
 
     # Bouton de modification
-    confirm_button = Button(edit_dialog_window, text="Enregistrer", command=lambda: add_or_edit_and_insert('edit', iid, name_entry.get(), number_entry.get(), email_entry.get(), est_favori.get()))
-    confirm_button.grid(row=4, column=0, columnspan=2, padx=5, pady=5) # Placer le bouton en bas au centre de la fenêtre
+    ajout_bouton = Button(fenetre_modifier, text="Enregistrer", command=lambda: ajouter_ou_modifier_et_inserer('edit', iid, nom_champ_de_saisie.get(), numero_champ_de_saisie.get(), email_champ_de_saisie.get(), est_favori.get()))
+    ajout_bouton.grid(row=4, column=0, columnspan=2, padx=5, pady=5) # Placer le bouton en bas au centre de la fenêtre
 
 
-def reset_search()->None:
+def reinitialiser_recherche()->None:
     '''
     Réinitialiser les résultats d'une recherche
 
@@ -463,14 +463,14 @@ def reset_search()->None:
     '''
 
     # Réinitialiser le tableau d'entrées et placer toutes les entrées du répertoire
-    clear_table_and_insert(repertoire)
+    effacer_tableau_et_inserer(repertoire)
 
     # Réactiver ajout d'entrée
     global est_dans_recherche
     est_dans_recherche = False
 
 
-def search_and_insert(critere:str, nom:str, numero:str, email:str, est_favori:bool)->None:
+def rechercher_et_inserer(critere:str, nom:str, numero:str, email:str, est_favori:bool)->None:
     '''
     Rechercher selon le nom/numero/email/favori et affiche les résultats dans le tableau des entrées
 
@@ -501,14 +501,14 @@ def search_and_insert(critere:str, nom:str, numero:str, email:str, est_favori:bo
         resultat_recherche = rep.search_favorite(repertoire, est_favori) # Rechercher en fonction du favori/non-favori
 
     # Afficher les résultats de la recherche dans le tableau d'entrées
-    clear_table_and_insert(resultat_recherche)
+    effacer_tableau_et_inserer(resultat_recherche)
 
     # Désactiver l'ajout d'entrée
     global est_dans_recherche
     est_dans_recherche = True
 
 
-def search_dialog()->None:
+def ouvrir_fenetre_rechercher()->None:
     '''
     Fenêtre de recherche (s'ouvre uniquement si répertoire ouvert)
 
@@ -523,64 +523,64 @@ def search_dialog()->None:
     if not repertoire_ouvert_verif(): return
 
     # Caractéristiques de la fenêtre
-    search_dialog_window = Toplevel(root)
-    search_dialog_window.title("Rechercher")
-    search_dialog_window.resizable(0, 0)
+    fenetre_rechercher = Toplevel(fenetre_principale)
+    fenetre_rechercher.title("Rechercher")
+    fenetre_rechercher.resizable(0, 0)
 
     # Bouton radio pour sélectionner le critère de recherche
     critere_recherche = StringVar()
-    name_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="nom")
-    numero_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="numero")
-    email_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="email")
-    favori_radiobutton = Radiobutton(search_dialog_window, variable=critere_recherche, value="favori")
+    nom_bouton_radio = Radiobutton(fenetre_rechercher, variable=critere_recherche, value="nom")
+    numero_bouton_radio = Radiobutton(fenetre_rechercher, variable=critere_recherche, value="numero")
+    email_bouton_radio = Radiobutton(fenetre_rechercher, variable=critere_recherche, value="email")
+    favori_bouton_radio = Radiobutton(fenetre_rechercher, variable=critere_recherche, value="favori")
 
     # Placer les boutons radio tout à gauche sur la même colonne
-    name_radiobutton.grid(row=0, column=0, padx=5)
-    numero_radiobutton.grid(row=1, column=0, padx=5)
-    email_radiobutton.grid(row=2, column=0, padx=5)
-    favori_radiobutton.grid(row=3, column=0, padx=5)
+    nom_bouton_radio.grid(row=0, column=0, padx=5)
+    numero_bouton_radio.grid(row=1, column=0, padx=5)
+    email_bouton_radio.grid(row=2, column=0, padx=5)
+    favori_bouton_radio.grid(row=3, column=0, padx=5)
 
     # Texte à côté des champs de saisie
-    name_label = Label(search_dialog_window, text="Nom :")
-    number_label = Label(search_dialog_window, text="Numéro :")
-    email_label = Label(search_dialog_window, text="E-mail :")
-    favorite_label = Label(search_dialog_window, text="Favori ?")
+    nom_texte = Label(fenetre_rechercher, text="Nom :")
+    numero_texte = Label(fenetre_rechercher, text="Numéro :")
+    email_texte = Label(fenetre_rechercher, text="E-mail :")
+    favori_texte = Label(fenetre_rechercher, text="Favori ?")
 
     # Placer les textes entres les boutons radios et les champs de saisie
-    name_label.grid(row=0, column=1, padx=(0,5))
-    number_label.grid(row=1, column=1, padx=(0,5))
-    email_label.grid(row=2, column=1, padx=(0,5))
-    favorite_label.grid(row=3, column=1, padx=(0,5))
+    nom_texte.grid(row=0, column=1, padx=(0,5))
+    numero_texte.grid(row=1, column=1, padx=(0,5))
+    email_texte.grid(row=2, column=1, padx=(0,5))
+    favori_texte.grid(row=3, column=1, padx=(0,5))
 
     # Champs de saisie
-    name_entry = Entry(search_dialog_window)
-    number_entry = Entry(search_dialog_window)
-    email_entry = Entry(search_dialog_window)
+    nom_champ_de_saisie = Entry(fenetre_rechercher)
+    numero_champ_de_saisie = Entry(fenetre_rechercher)
+    email_champ_de_saisie = Entry(fenetre_rechercher)
 
     # Case à cocher pour favori
     est_favori = StringVar()
-    favorite_checkbox = Checkbutton(search_dialog_window, variable=est_favori, onvalue='★', offvalue='')
+    favori_case_a_cocher = Checkbutton(fenetre_rechercher, variable=est_favori, onvalue='★', offvalue='')
 
     # Placer les champs de saisie et la case à cocher dans la même colonne tout à droite    
-    name_entry.grid(row=0, column=2, padx=5, pady=5)
-    number_entry.grid(row=1, column=2, padx=5, pady=(0,5))
-    email_entry.grid(row=2, column=2, padx=5, pady=(0,5))
-    favorite_checkbox.grid(row=3, column=2, padx=5, pady=(0,5), sticky='w')
+    nom_champ_de_saisie.grid(row=0, column=2, padx=5, pady=5)
+    numero_champ_de_saisie.grid(row=1, column=2, padx=5, pady=(0,5))
+    email_champ_de_saisie.grid(row=2, column=2, padx=5, pady=(0,5))
+    favori_case_a_cocher.grid(row=3, column=2, padx=5, pady=(0,5), sticky='w')
 
     # Cadre pour les boutons standards
-    button_frame = Frame(search_dialog_window) 
-    button_frame.grid(row=4, column=0, columnspan=3, padx=5, pady=5) # Placer le cadre en bas
+    bouton_cadre = Frame(fenetre_rechercher) 
+    bouton_cadre.grid(row=4, column=0, columnspan=3, padx=5, pady=5) # Placer le cadre en bas
 
     # Boutons de recherche et de réinitialisation de recherche
-    search_button = Button(button_frame, text="Rechercher", command=lambda: search_and_insert(critere_recherche.get(), name_entry.get(), number_entry.get(), email_entry.get(), bool(est_favori.get())))
-    reset_button = Button(button_frame, text="Réinitialiser", command=reset_search)
+    rechercher_bouton = Button(bouton_cadre, text="Rechercher", command=lambda: rechercher_et_inserer(critere_recherche.get(), nom_champ_de_saisie.get(), numero_champ_de_saisie.get(), email_champ_de_saisie.get(), bool(est_favori.get())))
+    reinitialiser_bouton = Button(bouton_cadre, text="Réinitialiser", command=reinitialiser_recherche)
 
     # Placer les boutons sur la même ligne dans le cadre et centre les boutons
-    search_button.grid(row=0, column=0, padx=5)
-    reset_button.grid(row=0, column=1, padx=5)
+    rechercher_bouton.grid(row=0, column=0, padx=5)
+    reinitialiser_bouton.grid(row=0, column=1, padx=5)
 
 
-def help_dialog()->None:
+def ouvrir_fenetre_aide()->None:
     '''
     Fenêtre d'aide avec une explication pour chaque bouton d'action
 
@@ -592,115 +592,115 @@ def help_dialog()->None:
     '''
     
     # Caractéristiques de la fenêtre
-    help_dialog_window = Toplevel(root) # Fenêtre au-dessus de la fenêtre principale
-    help_dialog_window.title("Aide")    # Titre de la fenêtre
-    help_dialog_window.resizable(0,0)   # Taille non-modifiable
+    fenetre_aide = Toplevel(fenetre_principale) # Fenêtre au-dessus de la fenêtre principale
+    fenetre_aide.title("Aide")    # Titre de la fenêtre
+    fenetre_aide.resizable(0,0)   # Taille non-modifiable
 
     # Fonction anonyme pour changer le texte d'explication
-    change_explanation_text = lambda text: explanation_label.config(text=text)
+    changer_texte_explication = lambda text: explication_texte.config(text=text)
 
     # Boutons d'actions à cliquer pour changer d'explication
-    new_button = Button(help_dialog_window, image=new_image, borderwidth=0, command=lambda: change_explanation_text(new_text))
-    open_button = Button(help_dialog_window, image=open_image, borderwidth=0, command=lambda: change_explanation_text(open_text))
-    save_button = Button(help_dialog_window, image=save_image, borderwidth=0, command=lambda: change_explanation_text(save_text))
-    add_button = Button(help_dialog_window, image=add_image, borderwidth=0, command=lambda: change_explanation_text(add_text))
-    remove_button = Button(help_dialog_window, image=remove_image, borderwidth=0, command=lambda: change_explanation_text(remove_text))
-    edit_button = Button(help_dialog_window, image=edit_image, borderwidth=0, command=lambda: change_explanation_text(edit_text))
-    search_button = Button(help_dialog_window, image=search_image, borderwidth=0, command=lambda: change_explanation_text(search_text))
-    help_button = Button(help_dialog_window, image=help_image, borderwidth=0, command=lambda: change_explanation_text(help_text))
+    nouveau_repertoire_bouton = Button(fenetre_aide, image=nouveau_repertoire_image, borderwidth=0, command=lambda: changer_texte_explication(nouveau_repertoire_explication))
+    ouvrir_repertoire_bouton = Button(fenetre_aide, image=ouvrir_repertoire_image, borderwidth=0, command=lambda: changer_texte_explication(ouvrir_repertoire_explication))
+    enregistrer_bouton = Button(fenetre_aide, image=enregistrer_image, borderwidth=0, command=lambda: changer_texte_explication(enregistrer_explication))
+    ajouter_bouton = Button(fenetre_aide, image=ajouter_image, borderwidth=0, command=lambda: changer_texte_explication(ajouter_explication))
+    supprimer_bouton = Button(fenetre_aide, image=supprimer_image, borderwidth=0, command=lambda: changer_texte_explication(supprimer_explication))
+    modifier_bouton = Button(fenetre_aide, image=modifier_image, borderwidth=0, command=lambda: changer_texte_explication(modifier_explication))
+    rechercher_bouton = Button(fenetre_aide, image=rechercher_image, borderwidth=0, command=lambda: changer_texte_explication(rechercher_explication))
+    aide_bouton = Button(fenetre_aide, image=aide_image, borderwidth=0, command=lambda: changer_texte_explication(aide_explication))
 
     # Placer les boutons d'actions sur la même ligne en haut
-    new_button.grid(row=0, column=0, padx=8, pady=8)
-    open_button.grid(row=0, column=1, padx=8)
-    save_button.grid(row=0, column=2, padx=8)
-    add_button.grid(row=0, column=3, padx=8)
-    remove_button.grid(row=0, column=4, padx=8)
-    edit_button.grid(row=0, column=5, padx=8)
-    search_button.grid(row=0, column=6, padx=8)
-    help_button.grid(row=0, column=7, padx=8)
+    nouveau_repertoire_bouton.grid(row=0, column=0, padx=8, pady=8)
+    ouvrir_repertoire_bouton.grid(row=0, column=1, padx=8)
+    enregistrer_bouton.grid(row=0, column=2, padx=8)
+    ajouter_bouton.grid(row=0, column=3, padx=8)
+    supprimer_bouton.grid(row=0, column=4, padx=8)
+    modifier_bouton.grid(row=0, column=5, padx=8)
+    rechercher_bouton.grid(row=0, column=6, padx=8)
+    aide_bouton.grid(row=0, column=7, padx=8)
 
     # Texte d'explication
-    explanation_label = Label(help_dialog_window, text="Cliquez sur une des icônes pour obtenir une explication")
-    explanation_label.grid(row=1, columnspan=8, pady=(0,8)) # Placer le texte au centre en bas
+    explication_texte = Label(fenetre_aide, text="Cliquez sur une des icônes pour obtenir une explication")
+    explication_texte.grid(row=1, columnspan=8, pady=(0,8)) # Placer le texte au centre en bas
 
     # Explications pour chaque bouton d'action
-    new_text = "Créer un nouveau répertoire dans un fichier au format CSV"
-    open_text = "Ouvrir un répertoire à partir d'un fichier au format CSV"
-    save_text = "Enregistrer les modifications faites au répertoire"
-    add_text = "Ajouter une entrée au répertoire"
-    remove_text = "Supprimer une entrée du répertoire"
-    edit_text = "Modifier une entrée du répertoire"
-    search_text = "Chercher des entrées à partir du nom/numéro/e-mail/favoris"
-    help_text = "Ouvrir cette fenêtre"
+    nouveau_repertoire_explication = "Créer un nouveau répertoire dans un fichier au format CSV"
+    ouvrir_repertoire_explication = "Ouvrir un répertoire à partir d'un fichier au format CSV"
+    enregistrer_explication = "Enregistrer les modifications faites au répertoire"
+    ajouter_explication = "Ajouter une entrée au répertoire"
+    supprimer_explication = "Supprimer une entrée du répertoire"
+    modifier_explication = "Modifier une entrée du répertoire"
+    rechercher_explication = "Chercher des entrées à partir du nom/numéro/e-mail/favoris"
+    aide_explication = "Ouvrir cette fenêtre"
 
 
 # Fenêtre principale
-root = Tk() # Initialiser la fenêtre
-root.wm_title("Repyrtoire") # Titre de la fenêtre
-root.resizable(0, 0) # Taille non-modifiable
+fenetre_principale = Tk() # Initialiser la fenêtre
+fenetre_principale.wm_title("Repyrtoire") # Titre de la fenêtre
+fenetre_principale.resizable(0, 0) # Taille non-modifiable
 
 # Images pour les boutons d'actions (réutilisées dans la fenêtre d'aide)
-new_image = PhotoImage(file="src/new.png")
-open_image = PhotoImage(file="src/open.png")
-save_image = PhotoImage(file="src/save.png")
-add_image = PhotoImage(file="src/add.png")
-remove_image = PhotoImage(file="src/remove.png")
-edit_image = PhotoImage(file="src/edit.png")
-search_image = PhotoImage(file="src/search.png")
-help_image = PhotoImage(file="src/help.png")
+nouveau_repertoire_image = PhotoImage(file="src/new.png")
+ouvrir_repertoire_image = PhotoImage(file="src/open.png")
+enregistrer_image = PhotoImage(file="src/save.png")
+ajouter_image = PhotoImage(file="src/add.png")
+supprimer_image = PhotoImage(file="src/remove.png")
+modifier_image = PhotoImage(file="src/edit.png")
+rechercher_image = PhotoImage(file="src/search.png")
+aide_image = PhotoImage(file="src/help.png")
 
 # Boutons d'actions
-new_button = Button(root, image=new_image, command=new_file, borderwidth=0)
-open_button = Button(root, image=open_image, command=open_file, borderwidth=0)
-save_button = Button(root, image=save_image, command=save, borderwidth=0)
-add_button = Button(root, image=add_image, command=add_dialog, borderwidth=0)
-remove_button = Button(root, image=remove_image, command=remove, borderwidth=0)
-edit_button = Button(root, image=edit_image, command=edit_dialog, borderwidth=0)
-search_button = Button(root, image=search_image, command=search_dialog, borderwidth=0)
-help_button = Button(root, image=help_image, command=help_dialog, borderwidth=0)
+nouveau_repertoire_bouton = Button(fenetre_principale, image=nouveau_repertoire_image, command=nouveau_repertoire, borderwidth=0)
+ouvrir_repertoire_bouton = Button(fenetre_principale, image=ouvrir_repertoire_image, command=ouvrir_repertoire, borderwidth=0)
+enregistrer_bouton = Button(fenetre_principale, image=enregistrer_image, command=enregistrer, borderwidth=0)
+ajouter_bouton = Button(fenetre_principale, image=ajouter_image, command=ouvrir_fenetre_ajouter, borderwidth=0)
+supprimer_bouton = Button(fenetre_principale, image=supprimer_image, command=supprimer_entree, borderwidth=0)
+modifier_bouton = Button(fenetre_principale, image=modifier_image, command=ouvrir_fenetre_modifier, borderwidth=0)
+rechercher_bouton = Button(fenetre_principale, image=rechercher_image, command=ouvrir_fenetre_rechercher, borderwidth=0)
+aide_bouton = Button(fenetre_principale, image=aide_image, command=ouvrir_fenetre_aide, borderwidth=0)
 
 # Placer les boutons d'actions sur la même ligne en haut
-new_button.grid(row=0, column=0, padx=8, pady=8)
-open_button.grid(row=0, column=1, padx=8)
-save_button.grid(row=0, column=2, padx=8)
-add_button.grid(row=0, column=3, padx=8)
-remove_button.grid(row=0, column=4, padx=8)
-edit_button.grid(row=0, column=5, padx=8)
-search_button.grid(row=0, column=6, padx=8)
-help_button.grid(row=0, column=7, padx=8)
+nouveau_repertoire_bouton.grid(row=0, column=0, padx=8, pady=8)
+ouvrir_repertoire_bouton.grid(row=0, column=1, padx=8)
+enregistrer_bouton.grid(row=0, column=2, padx=8)
+ajouter_bouton.grid(row=0, column=3, padx=8)
+supprimer_bouton.grid(row=0, column=4, padx=8)
+modifier_bouton.grid(row=0, column=5, padx=8)
+rechercher_bouton.grid(row=0, column=6, padx=8)
+aide_bouton.grid(row=0, column=7, padx=8)
 
 # Cadre pour le tableau d'entrées et sa barre de défilement
-entrees_frame = Frame(root)
-entrees_frame.grid(row=1, column=0, columnspan=8) # Placer le cadre en bas en prenant la même longueur que la totalité des boutons d'actions
+entrees_cadre = Frame(fenetre_principale)
+entrees_cadre.grid(row=1, column=0, columnspan=8) # Placer le cadre en bas en prenant la même longueur que la totalité des boutons d'actions
 
 # Tableau d'entrées
-entrees_table = ttk.Treeview(entrees_frame, selectmode='browse')
-entrees_table['columns'] = ('nom', 'numero', 'email', 'favori')
+entrees_tableau = ttk.Treeview(entrees_cadre, selectmode='browse')
+entrees_tableau['columns'] = ('nom', 'numero', 'email', 'favori')
 
 # Colonnes du tableau
-entrees_table.column("#0", width=0,  stretch=NO)
-entrees_table.column("nom",anchor=CENTER, width=80)
-entrees_table.column("numero",anchor=CENTER,width=100)
-entrees_table.column("email",anchor=CENTER,width=220)
-entrees_table.column("favori",anchor=CENTER,width=30)
+entrees_tableau.column("#0", width=0,  stretch=NO)
+entrees_tableau.column("nom",anchor=CENTER, width=80)
+entrees_tableau.column("numero",anchor=CENTER,width=100)
+entrees_tableau.column("email",anchor=CENTER,width=220)
+entrees_tableau.column("favori",anchor=CENTER,width=30)
 
-# En-têtes du tableau
-entrees_table.heading("#0",text="",anchor=CENTER)
-entrees_table.heading("nom",text="Nom",anchor=CENTER)
-entrees_table.heading("numero",text="Numéro",anchor=CENTER)
-entrees_table.heading("email",text="E-mail",anchor=CENTER)
-entrees_table.heading("favori",text="★",anchor=CENTER)
+# En-têtes du tableau (textes placés au centre)
+entrees_tableau.heading("#0",text="",anchor=CENTER)
+entrees_tableau.heading("nom",text="Nom",anchor=CENTER)
+entrees_tableau.heading("numero",text="Numéro",anchor=CENTER)
+entrees_tableau.heading("email",text="E-mail",anchor=CENTER)
+entrees_tableau.heading("favori",text="★",anchor=CENTER)
 
 # Sélectionner une entrée avec le clic gauche de la souris
-entrees_table.bind('<ButtonRelease-1>', entree_selectionnee)
+entrees_tableau.bind('<ButtonRelease-1>', entree_selectionnee)
 
 # Placer le tableau à gauche et prendre la quasi-totalité de la place disponible (place restante pour la barre de défilement)
-entrees_table.pack(side=LEFT, fill=BOTH, expand=True)
+entrees_tableau.pack(side=LEFT, fill=BOTH, expand=True)
 
 # Barre de défilement pour le tableau d'entrées
-entrees_scrollbar = Scrollbar(entrees_frame, orient=VERTICAL, command=entrees_table.yview) # Barre de défilement verticale
-entrees_table.configure(yscrollcommand=entrees_scrollbar.set) # Lier la barre de défilement au tableau d'entrées
+entrees_scrollbar = Scrollbar(entrees_cadre, orient=VERTICAL, command=entrees_tableau.yview) # Barre de défilement verticale
+entrees_tableau.configure(yscrollcommand=entrees_scrollbar.set) # Lier la barre de défilement au tableau d'entrées
 entrees_scrollbar.pack(side=RIGHT, fill=Y) # Placer la barre de défilement à droite du cadre et prendre toute la place
 
 # Boucle principale
-root.mainloop()
+fenetre_principale.mainloop()
