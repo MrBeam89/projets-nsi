@@ -4,6 +4,7 @@ Date : 30/03/2024
 Description : Repyrtoire (Gestion de répertoire avec GUI)
 """
 
+from os.path import basename, sep as DIRECTORY_SEP # Pour pouvoir exécuter peu importe le répertoire de travail courant et OS (séparateur de répertoire différent)
 from tkinter import * # GUI
 from tkinter import filedialog # Pour créer/ouvrir un répertoire
 from tkinter import ttk # Pour le tableau
@@ -19,23 +20,25 @@ changements_effectues = False
 est_dans_recherche = False
 
 # Chemins d'accès aux images et sons
-NEW_ICON_FILEPATH = "src/new.png"
-OPEN_ICON_FILEPATH = "src/open.png"
-SAVE_ICON_FILEPATH = "src/save.png"
-ADD_ICON_FILEPATH = "src/add.png"
-REMOVE_ICON_FILEPATH = "src/remove.png"
-EDIT_ICON_FILEPATH = "src/edit.png"
-SEARCH_ICON_FILEPATH = "src/search.png"
-HELP_ICON_FILEPATH = "src/help.png"
-REPYRTOIRE_ICON_FILEPATH = "src/repyrtoire_icon.png"
+REPYRTOIRE_DIR = __file__.rstrip(basename(__file__)) # Obtenir le chemin d'accès absolu des fichiers pour pouvoir exécuter peu importe le répertoire de travail courant
 
-ERROR_ICON_FILEPATH = "src/error.gif"
-WARNING_ICON_FILEPATH = "src/warning.gif"
+NEW_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}new.png"
+OPEN_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}open.png"
+SAVE_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}save.png"
+ADD_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}add.png"
+REMOVE_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}remove.png"
+EDIT_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}edit.png"
+SEARCH_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}search.png"
+HELP_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}help.png"
+REPYRTOIRE_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src{DIRECTORY_SEP}repyrtoire_icon.png"
+
+ERROR_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src/error.gif"
+WARNING_ICON_FILEPATH = f"{REPYRTOIRE_DIR}src/warning.gif"
 INFO_ICON_FILEPATH = SAVE_ICON_FILEPATH # Utilisé uniquement pour enregistrer
 
-ERROR_SFX_FILEPATH = "src/win_xp_error.mp3"
-WARNING_SFX_FILEPATH = "src/win_xp_warning.mp3"
-INFO_SFX_FILEPATH = "src/win_xp_info.mp3"
+ERROR_SFX_FILEPATH = f"{REPYRTOIRE_DIR}src/win_xp_error.mp3"
+WARNING_SFX_FILEPATH = f"{REPYRTOIRE_DIR}src/win_xp_warning.mp3"
+INFO_SFX_FILEPATH = f"{REPYRTOIRE_DIR}src/win_xp_info.mp3"
 
 # Initialiser le lecteur de son
 mixer.init()
