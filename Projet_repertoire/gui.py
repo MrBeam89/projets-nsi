@@ -10,6 +10,7 @@ from tkinter import ttk # Pour le tableau
 from pygame import mixer # Pour le son
 import rep_func as rep # Fonctions du répertoire
 import re # Pour vérifier e-mail
+import webbrowser # Easter egg
 
 # Variables modifiables dans toutes les fonctions de façon globale
 global repertoire, repertoire_ouvert, changements_effectues, est_dans_recherche
@@ -596,6 +597,24 @@ def ouvrir_fenetre_aide()->None:
     fenetre_aide.title("Aide")    # Titre de la fenêtre
     fenetre_aide.resizable(0,0)   # Taille non-modifiable
 
+    # Cadre pour les infos sur Répyrtoire
+    repyrtoire_cadre = Frame(fenetre_aide)
+    repyrtoire_cadre.grid(row=0, column=0, columnspan=8, pady=8) # Placer le cadre en haut et prendre la même longueur que les boutons d'actions
+
+    # Bouton-image Repyrtoire
+    repyrtoire_icone_image = PhotoImage(file="src/repyrtoire_icon.png")
+    repyrtoire_icone_bouton = Button(repyrtoire_cadre, image=repyrtoire_icone_image, borderwidth=0, command=lambda: webbrowser.open_new("https://github.com/MrBeam89/projets-nsi")) # Easter egg
+    repyrtoire_icone_bouton.image = repyrtoire_icone_image # Pour éviter que le ramasse-miettes de Python supprime l'image
+    
+    # Titre et sous-titre
+    repyrtoire_titre = Label(repyrtoire_cadre, text="Repyrtoire", font=('Comic Sans MS', 14))
+    repyrtoire_sous_titre = Label(repyrtoire_cadre, text="Par MrBeam89_ et TheBobHouse", font=('Comic Sans MS', 10))
+    
+    # Placer le bouton à gauche des textes (le bouton prend 2 lignes)
+    repyrtoire_titre.grid(row=0, column=1, padx=8)
+    repyrtoire_sous_titre.grid(row=1, column=1)
+    repyrtoire_icone_bouton.grid(row=0, column=0, rowspan=2, padx=16)
+
     # Fonction anonyme pour changer le texte d'explication
     changer_texte_explication = lambda text: explication_texte.config(text=text)
 
@@ -610,18 +629,18 @@ def ouvrir_fenetre_aide()->None:
     aide_bouton = Button(fenetre_aide, image=aide_image, borderwidth=0, command=lambda: changer_texte_explication(aide_explication))
 
     # Placer les boutons d'actions sur la même ligne en haut
-    nouveau_repertoire_bouton.grid(row=0, column=0, padx=8, pady=8)
-    ouvrir_repertoire_bouton.grid(row=0, column=1, padx=8)
-    enregistrer_bouton.grid(row=0, column=2, padx=8)
-    ajouter_bouton.grid(row=0, column=3, padx=8)
-    supprimer_bouton.grid(row=0, column=4, padx=8)
-    modifier_bouton.grid(row=0, column=5, padx=8)
-    rechercher_bouton.grid(row=0, column=6, padx=8)
-    aide_bouton.grid(row=0, column=7, padx=8)
+    nouveau_repertoire_bouton.grid(row=1, column=0, padx=8, pady=(0,8))
+    ouvrir_repertoire_bouton.grid(row=1, column=1, padx=8)
+    enregistrer_bouton.grid(row=1, column=2, padx=8)
+    ajouter_bouton.grid(row=1, column=3, padx=8)
+    supprimer_bouton.grid(row=1, column=4, padx=8)
+    modifier_bouton.grid(row=1, column=5, padx=8)
+    rechercher_bouton.grid(row=1, column=6, padx=8)
+    aide_bouton.grid(row=1, column=7, padx=8)
 
     # Texte d'explication
     explication_texte = Label(fenetre_aide, text="Cliquez sur une des icônes pour obtenir une explication")
-    explication_texte.grid(row=1, columnspan=8, pady=(0,8)) # Placer le texte au centre en bas
+    explication_texte.grid(row=2, columnspan=8, pady=(0,8)) # Placer le texte au centre en bas
 
     # Explications pour chaque bouton d'action
     nouveau_repertoire_explication = "Créer un nouveau répertoire dans un fichier au format CSV"
