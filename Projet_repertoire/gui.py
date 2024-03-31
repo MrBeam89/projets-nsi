@@ -9,6 +9,7 @@ from tkinter import filedialog # Pour créer/ouvrir un répertoire
 from tkinter import ttk # Pour le tableau
 from pygame import mixer # Pour le son
 import rep_func as rep # Fonctions du répertoire
+import re # Pour vérifier e-mail
 
 # Variables modifiables dans toutes les fonctions de façon globale
 global repertoire, repertoire_ouvert, changements_effectues, est_dans_recherche
@@ -23,6 +24,21 @@ INFO_SFX_FILEPATH = "src/win_xp_info.mp3"
 
 # Initialiser le lecteur de son
 mixer.init()
+
+
+def email_valide_verif(email:str)->bool:
+    '''
+    Vérifie si une adresse e-mail est valide
+
+    Paramètres :
+    - email (str) : Adresse e-mail à vérifier
+
+    Renvoie :
+    - (bool) : Adresse e-mail valide/non-valide (True/False)
+    '''
+
+    motif = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$' # Motif d'expression régulière pour une adresse e-mail valide
+    return re.match(motif, email) is not None # Renvoie True ou False pour une adresse valide/non-valide
 
 
 def message_popup(titre:str, image_file_path:str, message:str, sound_file_path:str)->None:
@@ -226,6 +242,11 @@ def add_or_edit_and_insert(operation:str, iid:int, nom:str, numero:str, email:st
     None
     '''
 
+    # Enlever les espaces au début et à la fin du nom, du numéro et de l'adresse e-mail
+    nom = nom.strip()
+    numero = numero.strip()
+    email = email.strip()
+
     # Si l'entrée existe déjà dans le répertoire
     if nom in repertoire and operation == "add":
         message_popup("Erreur", "src/error.gif", 'Une entrée associée à ce nom existe déjà!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
@@ -241,10 +262,15 @@ def add_or_edit_and_insert(operation:str, iid:int, nom:str, numero:str, email:st
         message_popup("Erreur", "src/error.gif", 'Pas de numéro/e-mail!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter/modifier
 
-    # Si le numéro contient autre chose que des chiffres
-    numero = numero.strip() # Enlever les espaces au début et à la fin
-    if not numero.isdigit():
+    # Si un numéro a été donné mais qu'il contient autre chose que des chiffres
+    if numero and not numero.isdigit():
         message_popup("Erreur", "src/error.gif", 'Numéro invalide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
+        return # Ne pas ajouter/modifier
+
+    # Si une adresse e-mail a été donnée mais qu'elle est invalide
+    email = email.strip()
+    if email and not email_valide_verif(email):
+        message_popup("Erreur", "src/error.gif", 'E-mail invalide!', ERROR_SFX_FILEPATH) # Afficher un message d'erreur via une fenêtre popup
         return # Ne pas ajouter/modifier
 
     # Ajouter/modifier l'entrée dans le répertoire si aucune erreur n'est détectée
