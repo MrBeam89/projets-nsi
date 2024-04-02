@@ -18,3 +18,19 @@ Dispose d'une version en ligne de commande et d'une avec une interface graphique
 
 ## George Boole
 Présentation de George Boole
+
+## Repyrtoire
+
+![Interface de Repyrtoire](https://github.com/MrBeam89/projets-nsi/blob/main/docs/repyrtoire-screenshot.png?raw=true)
+
+Gestionnaire de répertoire simple et facile à utiliser
+
+Fonctionnalités :
+- Créer plusieurs répertoires
+- Ajouter/supprimer/modifier des entrées du répertoire
+- Rechercher des entrées avec des critères spécifiques :
+    - Nom
+    - Numéro de téléphone
+    - Adresse e-mail
+    - Favori (ou pas)
+
